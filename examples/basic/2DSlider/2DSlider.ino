@@ -3,6 +3,7 @@
 #include <LovyanGFX.hpp>
 #include <LGFX_AUTODETECT.hpp>
 #include <LovyanGFX_DentaroUI.hpp>
+#define SLIDER_NO 0
 static LGFX lcd;
 LovyanGFX_DentaroUI ui( &lcd );
 static LGFX_Sprite ui_sprite0( &lcd );//スライダ用
