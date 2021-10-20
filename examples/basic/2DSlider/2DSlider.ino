@@ -9,7 +9,7 @@ static LGFX_Sprite ui_sprite0( &lcd );//スライダ用
 void setup(){
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
   ui.begin( &lcd ); lcd.init(); lcd.begin(); lcd.setRotation( 0 ); lcd.setColorDepth( 24 );
-  ui.createSliders( 0, 140, 240, 160, 1, 1, ui_sprite0, XY_VAL, MULTI_EVENT );
+  ui.createSliders( 0, 160, 240, 160, 1, 1, ui_sprite0, XY_VAL, MULTI_EVENT );
   ui.setBtnName( ui.getUiID("SLIDER_0"), "2DSlider" );
   lcd.setBrightness( 127 ); 
 }
