@@ -39,29 +39,31 @@ void LovyanGFX_DentaroUI::begin( LGFX* _lcd )
     _lcd->fillScreen(TFT_BLACK);
     _lcd->setColorDepth(COL_DEPTH);
   
-    Serial.printf("heap_caps_get_free_size(MALLOC_CAP_SPIRAM)            : %6d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM) );
-    Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
-    Serial.printf("heap_caps_get_largest_free_block(MALLOC_CAP_DMA):%d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA) );
-    Serial.printf("Width:%d, Height:%d\n", 256, 256);
-//    void *p = sprite1.createSprite(256, 256);
-//    if ( p == NULL ) {
-//      Serial.println("メモリが足りなくて確保できない");
-//    }
-    Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
-    Serial.printf("heap_caps_get_largest_free_block(MALLOC_CAP_DMA):%d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA) );
+//     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_SPIRAM)            : %6d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM) );
+//     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
+//     Serial.printf("heap_caps_get_largest_free_block(MALLOC_CAP_DMA):%d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA) );
+//     Serial.printf("Width:%d, Height:%d\n", 256, 256);
+// //    void *p = sprite1.createSprite(256, 256);
+// //    if ( p == NULL ) {
+// //      Serial.println("メモリが足りなくて確保できない");
+// //    }
+//     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
+//     Serial.printf("heap_caps_get_largest_free_block(MALLOC_CAP_DMA):%d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA) );
   }
 
-  m_url = "/tokyo/15/29094/"+String(12902)+".png";
+  //m_url = "/tokyo/15/29094/"+String(12902)+".png";
 
-  this-> g_basic_sprite.setPsram(USE_PSRAM);
-  this-> g_basic_sprite.createSprite(256, 256);//子スプライトメモリ確保
-  this-> g_basic_sprite.setColorDepth(TILE_CHILD_COL_DEPTH);//子スプライトの色深度
-  this-> g_basic_sprite.setPaletteGrayscale();
-  this-> g_basic_sprite.drawPngFile(SD, m_url,
-                                0, 0,
-                                256, 256,
-                                0, 0, 1.0, 1.0,
-                                datum_t::top_left);
+  // this-> g_basic_sprite.setPsram(USE_PSRAM);
+  // this-> g_basic_sprite.createSprite(256, 256);//子スプライトメモリ確保
+  // this-> g_basic_sprite.setColorDepth(TILE_CHILD_COL_DEPTH);//子スプライトの色深度
+  // this-> g_basic_sprite.setPaletteGrayscale();
+  // this-> g_basic_sprite.drawPngFile(SD, m_url,
+  //                               0, 0,
+  //                               256, 256,
+  //                               0, 0, 1.0, 1.0,
+  //                               datum_t::top_left);
+  Serial.println("");
+  Serial.println("[UI_ID information]");
 }
 
 //void LovyanGFX_DentaroUI::update(LGFX& _lcd, int _mode){
@@ -186,7 +188,9 @@ void LovyanGFX_DentaroUI::createToggles(int _uiSprite_x, int _uiSprite_y, int _w
 void LovyanGFX_DentaroUI::createBtns(int _uiSprite_x, int _uiSprite_y, int _w,int _h,int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo){//縦方向に並ぶ
   uiBoxes_num++;
   uiID++;
-  Serial.println("#define BTN_ID_"+String(uiID) + " " + String(uiID));
+  uiBoxes[uiID].label = "BTN_" + String(uiID);
+  Serial.println("BTN_" + String(uiID)  + "=[" + String(uiID) + "]");
+  
   int _startId = btnID;//スタート時のボタンIDをセット
   uiBoxes[uiID].b_sNo = btnID;
   uiBoxes[uiID].id  = uiID;
@@ -238,7 +242,8 @@ void LovyanGFX_DentaroUI::createBtns( int _x, int _y, int _w,int _h,int _row, in
   }else if(!_colMode){
   uiBoxes_num++;
   uiID++;
-  Serial.println("#define BTN_ID_"+String(uiID) + " " + String(uiID));
+  uiBoxes[uiID].label = "BTN_" + String(uiID);
+  Serial.println("BTN_"+String(uiID)  + "=[" + String(uiID) + "]");
   int _startId = btnID;//スタート時のボタンIDをセット
   uiBoxes[uiID].b_sNo = btnID;
   uiBoxes[uiID].id  = uiID;
@@ -321,7 +326,8 @@ int _eventNo)
   
   uiBoxes_num++;
   uiID++;
-  Serial.println("#define SLIDER_ID_"+String(uiID) + " " + String(uiID));
+  uiBoxes[uiID].label = "SLIDER_" + String(uiID);
+  Serial.println("SLIDER_" + String(uiID) + "=[" + String(uiID) + "]");
   int _startId = btnID;
   uiBoxes[uiID].b_sNo = btnID;
   uiBoxes[uiID].id  = uiID;
@@ -489,7 +495,7 @@ void LovyanGFX_DentaroUI::drawToggles(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& 
 void LovyanGFX_DentaroUI::createTile( LGFX_Sprite& _layoutSprite, int _layoutUiID, int _eventNo){//横方向に並ぶ
   uiBoxes_num++;
   uiID++;
-  Serial.println("#define TILE_ID_"+String(uiID) + " " + String(uiID));
+  Serial.println("TILE_ID_"+String(uiID) + " " + String(uiID));
   int _startId = btnID;
   uiBoxes[uiID].b_sNo = btnID;
   uiBoxes[uiID].id  = uiID;//いる？
@@ -717,6 +723,13 @@ int LovyanGFX_DentaroUI::getParentID(){
   return parentID;
 }
 
+int LovyanGFX_DentaroUI::getUiID( const char* _uiLabel){
+  int i = 0;
+  while(uiBoxes[i].label != String(_uiLabel)){
+    i++;
+  }
+  return i;
+}
 
 
 //void LovyanGFX_DentaroUI::setSliderVal(int _btnID){

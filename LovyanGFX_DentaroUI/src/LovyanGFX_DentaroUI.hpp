@@ -85,6 +85,7 @@ class UiContainer{
   int b_num = 0;
   int eventNo = -1; //MULTI_EVENT=-1
   int parentID = 0;
+  String label = "";
   //std::vector<int, int> uiPos = {0, 0};
   //std::vector<std::pair<int, int>> uiPos ={ {x, y}, {w, h} };
 };
@@ -101,6 +102,7 @@ class LovyanGFX_DentaroUI {
     uint16_t touchState = B00000000;
     unsigned long sTime = 0;
     unsigned long tappedTime = 0;
+    
     int eventState = -1;
     int tap_flick_thre = 82000;//タップとフリックの閾値
     int dist_thre = 40;
@@ -182,10 +184,7 @@ public:
     int getUiBoxNum();
     int getAllBtnNum();
     int getParentID();
+    int getUiID( const char* _uiLabel );
 //  getTouchingDist();//タッチしている距離を取得
 //  getTouchingTime();//タッチしている時間を取得
-
-  
-    
-    
 };
