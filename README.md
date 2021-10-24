@@ -16,10 +16,10 @@ LovyanGFXが動作するデバイス（ベータ版についてはタッチパ�
 LovyanGFXをインストールしてください。
 ご自身でUIを作成する場合、
 createToggles(), createSliders()など、create系の関数でUIのIＤを自動取得しますので、
-シリアルコンソールの出力で、以下のような記述を確認し、初めに定義してから使ってください。
+シリアルコンソールの出力で、以下のような記述を確認してから使ってください。
 
-#define SLIDER_ID_0 0
-#define BTN_ID_1 1
+#define SLIDER_0 0
+#define BTN_1 1
 
 loop内のdraw系の関数を利用をする際に必要になります。
 
