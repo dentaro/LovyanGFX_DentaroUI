@@ -44,6 +44,6 @@ void loop( void ){
     ui.drawBtns( ui.getUiID("BTN_0"), &lcd, ui_sprite0 ); 
   }
   ui.showTouchEventInfo( &lcd, lcd.width() - 100, 0 );//タッチイベントを視覚化する
-  ui.showInfo( lcd );//ボタン情報、フレームレート情報などを表示します。
+  ui.showInfo( &lcd );//ボタン情報、フレームレート情報などを表示します。
   delay(1);
 }

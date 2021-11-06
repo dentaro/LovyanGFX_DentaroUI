@@ -5,7 +5,28 @@
 // #include <vector>
 #include <deque>
 
-#define MULTI_EVENT -1
+#include <stdio.h>
+#include <string>
+#include <stdlib.h>
+#include <locale.h>
+#include <wchar.h>
+
+#include <limits.h>
+#include <stddef.h>
+
+// #include "stdafx.h"
+// #include <windows.h>
+// #include <mbstring.h>
+
+// #define MULTI_EVENT -1
+
+//開発者表記
+#define CHAR_3_BYTE 0//=JP
+#define CHAR_1_BYTE 2//=EN
+#define NUMERIC 4
+//ユーザー表記(Arduino側でしか使わない)
+#define JP 0
+#define EN 2
 
 #define SHOW_NAMED 0
 #define SHOW_ALL 1
@@ -21,6 +42,12 @@
 
 #define ROW_MODE false
 #define COL_MODE true
+
+#define SHIFT_NUM 5//シフトパネルの数
+#define HENKAN_NUM 57
+
+#define VISIBLE true
+#define INVISIBLE false
 
 class RetClass {
 public:
@@ -101,9 +128,84 @@ struct Vec2{
     , y(_y) {}
 };
 
+class FlickPanel
+{
+  // private:
+  public:
+  int b_No = -1;
+  std::deque<String> text_list; //パネルテキスト配置用デック配列
+  FlickPanel(){};
+};
+
 class LovyanGFX_DentaroUI {
   
    private:
+   
+    String kanalist[HENKAN_NUM][3] = {
+  {"あ","ぁ","＿"},
+  {"い","ぃ","ゐ"},
+  {"う","ぅ","＿"},
+  {"え","ぇ","ゑ"},
+  {"お","ぉ","＿"},
+  {"か","が","＿"},
+  {"き","ぎ","＿"},
+  {"く","ぐ","＿"},
+  {"け","げ","＿"},
+  {"こ","ご","＿"},
+  
+  {"さ","ざ","＿"},
+  {"し","じ","＿"},
+  {"す","ず","＿"},
+  {"せ","ぜ","＿"},
+  {"そ","ぞ","＿"},
+  {"た","だ","＿"},
+  {"ち","ぢ","＿"},
+  {"つ","っ","づ"},
+  {"て","で","＿"},
+  {"と","ど","＿"},
+  
+  {"は","ば","ぱ"},
+  {"ひ","び","ぴ"},
+  {"ふ","ぶ","ぷ"},
+  {"へ","べ","ぺ"},
+  {"ほ","ぼ","ぽ"},
+  {"や","ゃ","＿"},
+  {"ゆ","ゅ","＿"},
+  {"よ","ょ","＿"},
+  {"ー","～","＿"},
+
+  {"ア","ァ","＿"},
+  {"イ","ィ","ヰ"},
+  {"ウ","ゥ","＿"},
+  {"エ","ェ","ヱ"},
+  {"オ","ォ","＿"},
+  {"カ","ガ","＿"},
+  {"キ","ギ","＿"},
+  {"ク","グ","＿"},
+  {"ケ","ゲ","＿"},
+  {"コ","ゴ","＿"},
+  
+  {"サ","ザ","＿"},
+  {"シ","ジ","＿"},
+  {"ス","ズ","＿"},
+  {"セ","ゼ","＿"},
+  {"ソ","ゾ","＿"},
+  {"タ","ダ","＿"},
+  {"チ","ヂ","＿"},
+  {"ツ","ッ","ヅ"},
+  {"テ","デ","＿"},
+  {"ト","ド","＿"},
+  
+  {"ハ","バ","パ"},
+  {"ヒ","ビ","ピ"},
+  {"フ","ブ","プ"},
+  {"ヘ","ベ","ペ"},
+  {"ホ","ボ","ポ"},
+  {"ヤ","ャ","＿"},
+  {"ユ","ュ","＿"},
+  {"ヨ","ョ","＿"},
+};
+
     lgfx::v1::touch_point_t tp;
     lgfx::v1::touch_point_t sp;
     lgfx::v1::touch_point_t sp2;
@@ -115,6 +217,7 @@ class LovyanGFX_DentaroUI {
     unsigned long tappedTime = 0;
     
     int eventState = -1;
+    int flickState = -1;
     int tap_flick_thre = 82000;//タップとフリックの閾値
     int dist_thre = 40;
     int uiID = -1;
@@ -126,12 +229,21 @@ class LovyanGFX_DentaroUI {
     bool availableF = false;
     int uiMode = TOUCH_MODE;
     std::deque<TouchBtn*> touch_btn_list; //ボタン配置用デック配列
+    std::deque<TouchBtn*> flick_touch_btn_list; //フリックボタン配置用デック配列
+    // std::deque<String> flickPanel_text_list_0; //パネルテキスト配置用デック配列
+    // std::deque<String> flickPanel_text_list_1; //パネルテキスト配置用デック配列
+    std::deque<FlickPanel*> flickPanels;
+    int showFlickPanelNo = 0;
+    // std::deque<String> headerCaps; //パネルテキスト配置用デック配列
+    
+
     int timeCnt = 0;
     uint16_t clist[5] = {0,0,0,0,0};
     int preEventState = -1;
     int AngleCount = 0;
     int uiBoxes_num = 0;
     std::deque<UiContainer> uiBoxes;
+    UiContainer flickPanel;
     int layoutSprite_w = 0;
     int layoutSprite_h = 0;
     bool toggle_mode = false;
@@ -139,25 +251,54 @@ class LovyanGFX_DentaroUI {
     String m_url = "";
     RetClass obj_ret;
 
+    int shiftNum = 3;
+    int charMode = CHAR_3_BYTE; //日本語
+    //int charMode = CHAR_1_BYTE; //英語
     int sec, psec;
     int fps = 0;
     int frame_count = 0;
+    bool use_flickUiSpriteF = false;
+
+    int charNo=0;
+    String flickString = "";
+
+    String flickStr = "";
+    // String finalStr = "";
+    String flickStrDel = "";
+    // String finalStrDel = "";
+    String preFlickChar = "";
+    String previewFlickChar = "";
+    String finalChar ="";
+    // String retStr = "";
+    int fpNo = 0;
+    int kanaShiftNo = 0;
+    bool selectModeF = false;
+
+    int curbtnID;//現在の行番号
+    int curKanaRowNo = 0;
+    int curKanaColNo = 0;
+
+      
 
 public:
+
     // LovyanGFX_DentaroUI( LGFX& _lcd ): lcd(_lcd) {};
     LovyanGFX_DentaroUI( LGFX* _lcd ): lcd(_lcd) {};
     LGFX* lcd;
     LovyanGFX* lgfx;
+    LGFX_Sprite flickUiSprite;//フリック展開パネル用
     void update( LGFX* _lcd );
     void begin(LGFX* _lcd);
-    // void begin(LovyanGFX* _lgfx, int _mode);
+    void begin(LGFX* _lcd, LGFX_Sprite& _flickUiSprite, int _shiftNum);
     bool isAvailable(int _btnID);
     void addHandler(int _btnID, DelegateBase2* _func, uint16_t _runEventNo, int parentID = 0);
     void circle(LovyanGFX* _lgfx, uint16_t c, int fillF);
     void rect(LovyanGFX* _lgfx, uint16_t c, int fillF);
     float getAngle(lgfx::v1::touch_point_t a, lgfx::v1::touch_point_t b );
+    float getDist(lgfx::v1::touch_point_t a, lgfx::v1::touch_point_t b );
     int getPreEvent();
-    int getTouchEvent();
+    // int getTouchEvent();
+    
     void updateSelectBtnID(int _selectBtnID);
     lgfx::v1::touch_point_t getStartPos();//タッチされたスタート地点を取得
     lgfx::v1::touch_point_t getPos();//タッチしている座標を取得
@@ -165,6 +306,7 @@ public:
     void setStartPos(int _x, int _y);
     DelegateBase2 *ret0_DG = Delegate2<RetClass>::createDelegator2( &obj_ret, &RetClass::ret0 );//型式が違うプロトタイプ関数
     void createLayout( int _layoutSprite_x, int _layoutSprite_y, int _layoutSprite_w, int _layoutSprite_h, LGFX_Sprite& _layoutSprite, int _eventNo);
+    void setLayoutSpritePos( int _LayoutSpritePosx, int _LayoutSpritePosy );
     void setBtnName(int _btnNo, String _btnName);
     void setBtnName(int _btnNo, String _btnName, String _btnNameFalse);//toggle用
     void setQWERTY(int _uiID, String _btnsString, LGFX_Sprite& _sprite);
@@ -173,6 +315,17 @@ public:
     void createToggles( int _uiSprite_x, int _uiSprite_y, int _w,int _h, int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo);//縦方向に並ぶ
     void createSliders( int _x, int _y, int _w, int _h,  int _row, int _col, LGFX_Sprite& _uiSprite, int _visible_mode, int _eventNo);
     void createTile( LGFX_Sprite& _layoutSprite, int _layoutUiID, int _eventNo);
+
+    void createFlicks( int _uiSprite_x, int _uiSprite_y, int _w,int _h, int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo);//フリック生成
+    void createFlickBtns(LGFX* _lgfx, LGFX_Sprite& _flickUiSprite);
+    void drawFlickBtns(LovyanGFX* _lgfx,  LGFX_Sprite& _flickUiSprite, int _btnID, bool _visible, bool _available );
+    void setFlickPanel(int _flickPanelID, int _btnID, String _btnsString, int _btn_mode);
+    void setFlickPanel(int _flickPanelID, int _btnID, String _btnsString);
+
+    // void createFlicks( int _uiSprite_x, int _uiSprite_y, int _w,int _h,int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo, bool _colF);
+    void drawFlicks(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
+    void drawFlicks( int uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
+    
     // void drawBtns(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
     // void drawBtns(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
     void drawBtns(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
@@ -189,6 +342,7 @@ public:
     LGFX_Sprite getTileSprite(int _btnID);
     int getTouchBtnID();//タッチされたボタンオブジェクトの番号を取得
     int getEvent();
+    int getFlickEvent();
     void showTouchEventInfo(LovyanGFX* _lgfx, int _x, int _y);
     lgfx::v1::touch_point_t getTouchPoint(int _x, int _y);
     float getSliderVal( int uiID, int _btnNo );
@@ -203,6 +357,15 @@ public:
 
     void setAllBtnVisibleF(int uiID, bool _visible);
     void setVisibleF(int uiID, int _btnID, bool _visible);
+
+    void setCharMode(int _charMode);
+    int getCharMode();
+
+    void changeBtnMode(int _uiID, int _btnID, int _btn_mode);
+
+    String getFlickStr();
+
+    int getflickPanelBtnNo(int uiID);
     
     int getUiFirstNo(int _uiID);
     int getUiBtnNum(int _uiID);
@@ -211,7 +374,32 @@ public:
     int getParentID();
     int getUiID( const char* _uiLabel );
 
+    // void setShowFlickPanelNo(int _showFlickPanelNo);
+    void setUiLabels(int uiID, int _showFlickPanelNo);
+    lgfx::v1::touch_point_t getBtnPos(int _btnID);
+
     void showInfo(LGFX& _lgfx );
+    void showInfo( LovyanGFX* _lgfx );
+
+    String getHenkanChar(int _henkanListNo, int _kanaShiftNo);
+    void setFlickPanels();//キーボード用プリセット
+    void setFlick();//キーボード用プリセッ；
+    void setFlick(int _charMode);
+    void flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _ui_sprite0, LGFX_Sprite& ui_sprite1, LGFX_Sprite& ui_sprite2, LGFX_Sprite& _flickUiSprite );
+    String getInvisibleFlickStrings();
+    String getFlickString();
+    String getFlickString(bool _visibleMode);
+    String getFlickChar();
+    String getKana(int _panelID, int _rowID, int _colID, int _transID);
+
+const char* next_c_mb(const char* c);
+void ngetc(char* const dst,const char* src);
+bool nchr_cmp(const char* c1, const char* c2);
+    std::vector<std::string> split_mb(const char* src, const char* del);
+
+    // std::vector<std::string> delete_mb(const char* src, const char* del);
+    String delEndChar(String _str, int _ByteNum);
+
 //  getTouchingDist();//タッチしている距離を取得
 //  getTouchingTime();//タッチしている時間を取得
 };

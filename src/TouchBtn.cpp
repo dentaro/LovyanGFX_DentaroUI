@@ -9,14 +9,14 @@
 
 
 
-void TouchBtn::initBtn(int _btnID, int _b_x, int _b_y, int _b_w, int _b_h, String _btn_name, 
+void TouchBtn::initBtn(int _btnID, String _btnIDlabel, int _b_x, int _b_y, int _b_w, int _b_h, String _btn_name, 
 lgfx::v1::touch_point_t _layoutSpritePos,
 lgfx::v1::touch_point_t _uiSpritePos,
 LGFX_Sprite& _sprite,
-bool _toggle_mode)
+int _btn_mode)
 {
   btnID = _btnID;
-  touch_Mode = TOUCH_BTN_MODE;
+  btnIDlabel = _btnIDlabel;
   uiSpritePos = _uiSpritePos;
   b_x = _b_x; 
   b_y = _b_y;
@@ -25,17 +25,18 @@ bool _toggle_mode)
   b_hw = b_w/2; 
   b_hh = b_h/2;
   btn_name = _btn_name;
-  toggle_mode = _toggle_mode;
+  btn_mode = _btn_mode;
+  layoutSpritePos = _layoutSpritePos;
 }
 
-void TouchBtn::initSlider(int _btnID, int _s_x, int _s_y, int _s_w, int _s_h, String _btn_name, 
+void TouchBtn::initSlider( int _btnID, int _s_x, int _s_y, int _s_w, int _s_h, String _btn_name, 
 lgfx::v1::touch_point_t _layoutSpritePos,
 lgfx::v1::touch_point_t _uiSpritePos,
 LGFX_Sprite& _sprite,
 int _xy_mode )
 {
   btnID = _btnID;
-  touch_Mode = TOUCH_SLIDER_MODE;
+  btn_mode = TOUCH_SLIDER_MODE;
   uiSpritePos = _uiSpritePos;
   s_x = _s_x; 
   s_y = _s_y;
@@ -47,6 +48,7 @@ int _xy_mode )
   xy_mode = _xy_mode;
   sliderPosx = _s_x + (_s_w/2);
   sliderPosy = _s_x + (_s_h/2);
+  layoutSpritePos = _layoutSpritePos;
 }
 
 void TouchBtn::initTile(int _btnID,String _btn_name, 
@@ -55,7 +57,7 @@ LGFX_Sprite& _layoutSprite,
 LGFX_Sprite& _g_basic_sprite)
 {
   btnID = _btnID;
-  touch_Mode = TOUCH_TILE_MODE;
+  btn_mode = TOUCH_TILE_MODE;
   b_x  = _layoutSpritePos.x;
   b_y  = _layoutSpritePos.y;
   b_w  = _layoutSprite_w; 
@@ -65,9 +67,8 @@ LGFX_Sprite& _g_basic_sprite)
   b_qw = _layoutSprite_w/4;
 //  b_qh = h/4;
   btn_name = _btn_name;
-
-  divSprite0.setPsram(false);//DMA利用のためPSRAMは切る
-  divSprite0.createSprite(b_qw, _layoutSprite_h);//子スプライトメモリ確保
+  divSprite0.setPsram( false );//DMA利用のためPSRAMは切る
+  divSprite0.createSprite( b_qw, _layoutSprite_h );//子スプライトメモリ確保
 }
 
 void TouchBtn::setBtnName(String _btnName)
@@ -84,9 +85,10 @@ void TouchBtn::btnDraw(LGFX_Sprite& _uiSprite)
 {
 
   _uiSprite.setTextSize(1);
+  _uiSprite.setFont(&lgfxJapanGothicP_20);
   String drawName = "";
   
-  if(this->toggle_mode == true)
+  if(this->btn_mode == TOUCH_TOGGLE_MODE)//トグルボタンの時
   {
     if(this->toggleVal == true){
       _uiSprite.fillRoundRect(this->b_x, this->b_y, this->b_w, this->b_h, 10, TFT4_WHITE);
@@ -101,29 +103,55 @@ void TouchBtn::btnDraw(LGFX_Sprite& _uiSprite)
     b_str_hw = _uiSprite.textWidth(drawName)/2;
     _uiSprite.drawString(drawName, b_x + b_hw - b_str_hw , b_y + b_hh - 4);
   }
-  else if(this->toggle_mode == false)//普通のボタンの時
+  else if(this->btn_mode == TOUCH_BTN_MODE)//普通のボタンの時
   {
-    if(visibleF == true){
+    if( visibleF == true ){
       _uiSprite.fillRoundRect(this->b_x, this->b_y, this->b_w, this->b_h, 10, TFT4_WHITE);
       _uiSprite.setTextColor(TFT4_BLACK);
-      drawName = btn_name;
-      b_str_hw = _uiSprite.textWidth(drawName)/2;
-      _uiSprite.drawString(drawName, b_x + b_hw - b_str_hw , b_y + b_hh - 4);
+      //_uiSprite.setFont(&lgfxJapanGothicP_20);
+      // drawName = btn_name;
+      b_str_hw = _uiSprite.textWidth(btn_name)/2;
+      _uiSprite.drawString(btn_name, b_x + b_hw - b_str_hw , b_y + b_hh - 4);
     }
 
-    // if(availableF == false){
-
-    // }
   }
-
-  
-
+  else if( this->btn_mode == TOUCH_FLICK_MODE )//フリックボタンの時
+  {
+    if( visibleF == true )
+    {
+      _uiSprite.fillRoundRect( this->b_x, this->b_y, this->b_w, this->b_h, 10, TFT4_WHITE );
+      _uiSprite.setTextColor( TFT4_BLACK );
+      //_uiSprite.setFont(&lgfxJapanGothicP_20);
+      // drawName = btnIDlabel;//btn_name;
+      b_str_hw = _uiSprite.textWidth( btn_name ) / 2;
+      _uiSprite.drawString( btn_name, b_x + b_hw - b_str_hw , b_y + b_hh - 4 );
+    }
+  }
 
   if(selectBtnF){
     _uiSprite.drawRoundRect(this->b_x, this->b_y, this->b_w, this->b_h, 10, TFT4_WHITE);
   }else{
     _uiSprite.drawRoundRect(this->b_x, this->b_y, this->b_w, this->b_h, 10, TFT4_BLACK);
   }
+}
+
+void TouchBtn::flickDraw(LGFX_Sprite& _uiSprite)
+{
+  // _uiSprite.setTextSize(1);
+  // String drawName = "";
+
+  // _uiSprite.fillRoundRect( this->b_x, this->b_y, this->b_w, this->b_h, 10, TFT4_WHITE );
+  
+  // _uiSprite.fillRoundRect(
+  //         this->b_x, 
+  //         this->b_y, 
+  //         48,//flick_touch_btn_list[i]->getBtnSize().w, 
+  //         48,//flick_touch_btn_list[i]->getBtnSize().h, 
+  //         10, TFT_WHITE);
+  // _uiSprite.setTextColor( TFT4_BLACK );
+  // drawName = btn_name;
+  // b_str_hw = _uiSprite.textWidth( drawName ) / 2;
+  // _uiSprite.drawString( drawName, b_x + b_hw - b_str_hw , b_y + b_hh - 4 );
 }
 
 void TouchBtn::sliderDraw(LGFX_Sprite& _uiSprite, lgfx::v1::touch_point_t _tp)
@@ -154,7 +182,7 @@ void TouchBtn::sliderDraw(LGFX_Sprite& _uiSprite, lgfx::v1::touch_point_t _tp)
   }
   //_uiSprite.drawLine(this->s_x, this->s_x, this->s_x + this->s_w, this->s_x, TFT4_WHITE);
   
-  if( toggle_mode == false ){
+  if( btn_mode == TOUCH_BTN_MODE ){
     b_str_hw = _uiSprite.textWidth(btn_name)/2;
     _uiSprite.drawString(btn_name, this->s_x + this->s_hw - b_str_hw , this->s_y + this->s_hh -4);
   }
@@ -212,6 +240,10 @@ bool TouchBtn::getVisibleF(){
   return visibleF;
 }
 
+int TouchBtn::getBtnMode(){
+  return btn_mode;
+}
+
 void TouchBtn::addHandler(DelegateBase2* _func){
   lim2.push_back(_func);
 }
@@ -220,17 +252,17 @@ void TouchBtn::delHandlers2(){
       std::list<DelegateBase2*>::iterator ite2 =  lim2.begin();
       while( ite2 != lim2.end() )
       {
-        DelegateBase2 *ptr = (*ite2);
+        // DelegateBase2 *ptr = (*ite2);
         lim2.pop_front();//
       }
 }
 
-void TouchBtn::run2(int _btnID, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo, lgfx::v1::touch_point_t _layoutSpritePos)
+void TouchBtn::run2(int _btnID, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo)
 {
-  run2(_btnID, _sp.x, _sp.y, _tp.x, _tp.y, _eventState, _runEventNo, _layoutSpritePos);
+  run2(_btnID, _sp.x, _sp.y, _tp.x, _tp.y, _eventState, _runEventNo);
 }
 
-void TouchBtn::run2(int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo, lgfx::v1::touch_point_t _layoutSpritePos){
+void TouchBtn::run2(int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo){
       sp.x = _sx;
       sp.y = _sy;
       tp.x = _tx;
@@ -238,13 +270,15 @@ void TouchBtn::run2(int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventSt
 
       eventState = _eventState;
       runEventNo = _runEventNo;
+
+      
       
       std::list<DelegateBase2*>::iterator ite2 =  lim2.begin();
       while( ite2 != lim2.end() )
       {
         DelegateBase2 *ptr = (*ite2);
 
-        if(touch_Mode == TOUCH_TILE_MODE){
+        if(btn_mode == TOUCH_TILE_MODE){
           if(sp.x > b_x 
           && sp.x < b_x + b_w 
           && sp.y > b_y 
@@ -252,12 +286,12 @@ void TouchBtn::run2(int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventSt
             (*ptr)( _btnID );    // 関数を実行！
           }
         }
-        else if(touch_Mode == TOUCH_BTN_MODE)
+        else if(btn_mode == TOUCH_BTN_MODE)
         {//普通のボタン用の判定
-          if(sp.x > b_x     + _layoutSpritePos.x + this->uiSpritePos.x 
-          && sp.x < b_x+b_w + _layoutSpritePos.x + this->uiSpritePos.x
-          && sp.y > b_y     + _layoutSpritePos.y + this->uiSpritePos.y
-          && sp.y < b_y+b_h + _layoutSpritePos.y + this->uiSpritePos.y)
+          if(sp.x > b_x     + layoutSpritePos.x + this->uiSpritePos.x 
+          && sp.x < b_x+b_w + layoutSpritePos.x + this->uiSpritePos.x
+          && sp.y > b_y     + layoutSpritePos.y + this->uiSpritePos.y
+          && sp.y < b_y+b_h + layoutSpritePos.y + this->uiSpritePos.y)
           {//ボタンの領域内に入っていれば
           if(availableF == true){
             (*ptr)( _btnID );    // 関数を実行！
@@ -266,7 +300,21 @@ void TouchBtn::run2(int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventSt
             if(eventState == runEventNo && eventState != NO_EVENT)this->switchToggleVal();
           }
         }
-        else if(touch_Mode == TOUCH_SLIDER_MODE)
+        else if(btn_mode == TOUCH_FLICK_MODE)//FLICK_MODEもこちらで処理
+        {//普通のボタン用の判定
+          if(sp.x > b_x     + layoutSpritePos.x + this->uiSpritePos.x 
+          && sp.x < b_x+b_w + layoutSpritePos.x + this->uiSpritePos.x
+          && sp.y > b_y     + layoutSpritePos.y + this->uiSpritePos.y
+          && sp.y < b_y+b_h + layoutSpritePos.y + this->uiSpritePos.y)
+          {//ボタンの領域内に入っていれば
+          if(availableF == true){
+            (*ptr)( _btnID );    // 関数を実行！
+          }
+            // if(eventState == runEventNo)this->switchToggleVal();
+            if(eventState == runEventNo && eventState != NO_EVENT)this->switchToggleVal();
+          }
+        }
+        else if(btn_mode == TOUCH_SLIDER_MODE)
         {//スライダボタン用の判定
           if(sp.x > this->s_x + this->uiSpritePos.x
           && sp.x < this->s_x + this->uiSpritePos.x + this->s_w
@@ -346,4 +394,8 @@ void TouchBtn::setTilePos(lgfx::v1::touch_point_t _pos){
 
 int TouchBtn::get_xy_mode(){
   return xy_mode;
+}
+
+lgfx::v1::touch_point_t TouchBtn::getBtnPos(){
+  return getTouchPoint(this->b_x, this->b_y);
 }

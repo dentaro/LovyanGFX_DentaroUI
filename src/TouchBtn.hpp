@@ -5,15 +5,19 @@
 #include <LGFX_AUTODETECT.hpp>  // クラス"LGFX"を準備します
 #include <list>
 
+
 #define USE_PSRAM true
 
 #define COL_DEPTH 4
 #define TILE_COL_DEPTH 16
 #define TILE_CHILD_COL_DEPTH 8
 
+#define TOUCH_NONE_MODE -1
 #define TOUCH_BTN_MODE 0
 #define TOUCH_TILE_MODE 1
 #define TOUCH_SLIDER_MODE 2
+#define TOUCH_FLICK_MODE 3
+#define TOUCH_TOGGLE_MODE 4
 
 #define TFT4_BLACK 0
 #define TFT4_BLUE 1
@@ -32,32 +36,40 @@
 #define B_MOVE B00000011
 #define B_RELEASE B00000010
 
+//eventState
 #define NO_EVENT -1
 #define UNTOUCH 0
 #define DRAG 2
 #define TAPPED 3
 #define WTAPPED 4
 #define FLICK 5 //フリックの中心、始まりのイベント
+#define FLICKED 6 //フリック終わりのイベント
 
-#define TOUCH 6
-#define WAIT 7
-#define MOVE 8
-#define RELEASE 9
+#define TOUCH 7
+#define WAIT 8
+#define MOVE 9
+#define RELEASE 10
 
-#define RIGHT_FLICK 10
-#define U_R_FLICK 11
-#define UP_FLICK 12
-#define L_U_FLICK 13
-#define LEFT_FLICK 14
-#define D_L_FLICK 15
-#define DOWN_FLICK 16
-#define R_D_FLICK 17
+//flickState
+#define RIGHT_FLICK 20
+#define U_R_FLICK 21
+#define UP_FLICK 22
+#define L_U_FLICK 23
+#define LEFT_FLICK 24
+#define D_L_FLICK 25
+#define DOWN_FLICK 26
+#define R_D_FLICK 27
 
-#define MULTI_EVENT 21
+#define MULTI_EVENT 31
 
 #define X_VAL 0
 #define Y_VAL 1
 #define XY_VAL 2
+
+// #define BTN_MODE_NONE -1
+// #define BTN_MODE_NORMAL 0
+// #define BTN_MODE_TOGGLE 1
+// #define BTN_MODE_FLICK 2
 
 class DelegateBase2 {
 public:
@@ -123,14 +135,14 @@ class TouchBtn {
     int sliderPosx = 0;
     int sliderPosy = 0;
     int xy_mode = XY_VAL;
-    int touch_Mode = TOUCH_BTN_MODE;
     
     uint8_t bgColorIndex;
     LGFX_Sprite divSprite0;
     uint16_t color = TFT_WHITE;
     int btnID = 0;
+    String btnIDlabel = "";//ボタン番号
     bool selectBtnF = false;
-    String btn_name;
+    String btn_name = "";//ボタンの名前
     String btn_nameFalse;
     int eventState = -1;
     int runEventNo = -1;
@@ -139,7 +151,7 @@ class TouchBtn {
     bool availableF = false;
     bool visibleF = false;
     
-    bool toggle_mode = false;
+    int btn_mode = TOUCH_NONE_MODE;
     bool toggleVal = false;
 
     lgfx::v1::touch_point_t sp;
@@ -153,11 +165,11 @@ class TouchBtn {
 public:
     TouchBtn(LGFX* _lcd): lcd(_lcd) {}
     LGFX* lcd;
-    void initBtn(int _btnId, int _x, int _y, int _w, int _h, String _name, 
+    void initBtn(int _btnId, String _btnIDlabel, int _x, int _y, int _w, int _h, String _name, 
     lgfx::v1::touch_point_t _layoutSpritePos,
     lgfx::v1::touch_point_t _spritePos,
     LGFX_Sprite& _sprite,
-    bool _toggle_mode);
+    int _btn_mode);
     
     void initSlider(int _btnID, int _s_x, int _s_y, int _s_w, int _s_h, String _btn_name, 
     lgfx::v1::touch_point_t _layoutSpritePos,
@@ -169,6 +181,7 @@ public:
     void setBtnName(String _btnName);
     void setBtnNameFalse(String _btnNameFalse);
     void btnDraw(LGFX_Sprite& _sprite);
+    void flickDraw(LGFX_Sprite& _sprite);
     void sliderDraw(LGFX_Sprite& _uiSprite, lgfx::v1::touch_point_t _tp);
     void tileDraw(LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, lgfx::v1::touch_point_t _layoutSpritePos, lgfx::v1::touch_point_t _sp, uint8_t _bgColIndex, LGFX_Sprite& _g_basic_sprite);
     void setAvailableF(bool _availableF);
@@ -177,13 +190,18 @@ public:
     bool getVisibleF();
     void addHandler(DelegateBase2* _func);
     void delHandlers2();
-    void run2( int _btnID, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo, lgfx::v1::touch_point_t _layoutSpritePos);
-    void run2( int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo, lgfx::v1::touch_point_t _layoutSpritePos);
+    void run2( int _btnID, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo);
+    void run2( int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo);
     void setColor(uint16_t _color);
     void setBgColorIndex(uint16_t _bgColorIndex);
     int getBtnID();
+    int getBtnMode();
+    
     void setPngTile(fs::FS &fs, String _m_url, LGFX_Sprite& _g_basic_sprite);
     lgfx::v1::touch_point_t getTouchPoint(int _x, int _y);
+    lgfx::v1::touch_point_t getBtnPos();
+    
+    
     void setSelectBtnF(bool _selectBtnF);
     void switchToggleVal();
     //private対策
@@ -194,5 +212,7 @@ public:
     // lgfx::v1::touch_point_t  getTilePos();
     void setTilePos(lgfx::v1::touch_point_t _pos);
     int get_xy_mode();
+
+    
   
 };

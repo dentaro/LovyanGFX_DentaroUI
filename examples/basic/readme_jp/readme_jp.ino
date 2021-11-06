@@ -59,6 +59,15 @@ void setup() {
   ui.setBtnName( 7, "MAX", "OFF" );
   //トグルボタンのID番号を指定して、オン状態、オフ状態の順で名前をつけます。
 
+  //初期描画
+  //スライダの値を入れておく
+  ui.setSliderVal( ui.getUiID("SLIDER_0"), 0 , 1.0, 0.5 ); 
+  v = 255;
+  //スライダボタンを描画します。
+  ui.drawSliders( ui.getUiID("SLIDER_0"), &lcd, ui_sprite0 );
+  //トグルボタンを描画します。
+  ui.drawToggles( ui.getUiID("BTN_1"),    &lcd, ui_sprite1 );
+
 }
 void loop( void ){
   ui.update( &lcd );//この一行でタッチボタンイベントを取得します。
@@ -85,7 +94,7 @@ void loop( void ){
   ui.drawToggles( ui.getUiID("BTN_1"),    &lcd, ui_sprite1 );
 
   ui.showTouchEventInfo( &lcd, lcd.width() - 100, 0 );//タッチイベントを視覚化する
-  ui.showInfo( lcd );//ボタン情報、フレームレート情報などを表示します。
+  ui.showInfo( &lcd );//ボタン情報、フレームレート情報などを表示します。
   //WDT対策
   delay(1);
 }

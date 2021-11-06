@@ -30,5 +30,8 @@ void loop( void ){
       ui.getSliderVec2( ui.getUiID("SLIDER_0"), SLIDER_NO_1).y * 160,
       20,20,TFT_BLUE); 
   }
-  ui.drawSliders( ui.getUiID("SLIDER_0"), &lcd, ui_sprite0 ); 
+  ui.drawSliders( ui.getUiID("SLIDER_0"), &lcd, ui_sprite0 );
+  ui.showTouchEventInfo( &lcd, lcd.width() - 100, 0 );//タッチイベントを視覚化する
+  ui.showInfo( &lcd );//ボタン情報、フレームレート情報などを表示します。
+  delay(1); 
 }
