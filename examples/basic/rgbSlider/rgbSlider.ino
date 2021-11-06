@@ -7,7 +7,7 @@ int c_val[4] = { 127, 127, 127, 127 };
 String btn_name[4] = { "Brightness", "RED", "GREEN", "BLUE" };
 void setup() {
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
-  ui.begin( &lcd, 24, 3, true );//lcd, 色深度,回転方向,タッチキャリブレーション
+  ui.begin( &lcd, 24, 0, true );//lcd, 色深度,回転方向,タッチキャリブレーション
   ui.createSliders( 0,   140, 180, 180, 1, 4, ui_sprite0, X_VAL, MULTI_EVENT );
   ui.createToggles( 180, 140,  60, 180, 1, 4, ui_sprite1, TOUCH );
   for( int i=0; i < 4; i++ ){ ui.setBtnName( i, btn_name[i] ); ui.setBtnName( 4 + i, "MAX", "OFF" ); }
