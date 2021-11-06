@@ -83,7 +83,6 @@ void TouchBtn::setBtnNameFalse(String _btnNameFalse)
 
 void TouchBtn::btnDraw(LGFX_Sprite& _uiSprite)
 {
-
   _uiSprite.setTextSize(1);
   _uiSprite.setFont(&lgfxJapanGothicP_20);
   String drawName = "";
@@ -113,7 +112,6 @@ void TouchBtn::btnDraw(LGFX_Sprite& _uiSprite)
       b_str_hw = _uiSprite.textWidth(btn_name)/2;
       _uiSprite.drawString(btn_name, b_x + b_hw - b_str_hw , b_y + b_hh - 4);
     }
-
   }
   else if( this->btn_mode == TOUCH_FLICK_MODE )//フリックボタンの時
   {
@@ -286,7 +284,7 @@ void TouchBtn::run2(int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventSt
             (*ptr)( _btnID );    // 関数を実行！
           }
         }
-        else if(btn_mode == TOUCH_BTN_MODE)
+        else if(btn_mode == TOUCH_BTN_MODE||btn_mode == TOUCH_TOGGLE_MODE)
         {//普通のボタン用の判定
           if(sp.x > b_x     + layoutSpritePos.x + this->uiSpritePos.x 
           && sp.x < b_x+b_w + layoutSpritePos.x + this->uiSpritePos.x

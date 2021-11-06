@@ -2,7 +2,14 @@
 
 #include "SD.h"
 #define LGFX_USE_V1
-#include <LGFX_AUTODETECT.hpp>  // クラス"LGFX"を準備します
+#include <LovyanGFX.hpp>
+
+//M5stackなどの製品で使用するときはAUTODETECTを使って下さい。
+#include <LGFX_AUTODETECT.hpp>
+
+//自作基板などで、AUTODETECTの代わりにカスタム設定を使いたいときはこちらを編集して下さい。
+// #include "LGFX_ESP32_custom.hpp"
+
 #include <list>
 
 
@@ -213,6 +220,4 @@ public:
     void setTilePos(lgfx::v1::touch_point_t _pos);
     int get_xy_mode();
 
-    
-  
 };

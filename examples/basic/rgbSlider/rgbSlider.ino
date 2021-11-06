@@ -1,7 +1,3 @@
-#define LGFX_AUTODETECT
-#define LGFX_USE_V1
-#include <LovyanGFX.hpp>
-#include <LGFX_AUTODETECT.hpp>
 #include <LovyanGFX_DentaroUI.hpp>
 static LGFX lcd;
 LovyanGFX_DentaroUI ui( &lcd );
@@ -11,7 +7,7 @@ int c_val[4] = { 127, 127, 127, 127 };
 String btn_name[4] = { "Brightness", "RED", "GREEN", "BLUE" };
 void setup() {
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
-  ui.begin( &lcd ); lcd.init(); lcd.begin(); lcd.setRotation( 0 ); lcd.setColorDepth( 24 );
+  ui.begin( &lcd, 24, 3, true );//lcd, 色深度,回転方向,タッチキャリブレーション
   ui.createSliders( 0,   140, 180, 180, 1, 4, ui_sprite0, X_VAL, MULTI_EVENT );
   ui.createToggles( 180, 140,  60, 180, 1, 4, ui_sprite1, TOUCH );
   for( int i=0; i < 4; i++ ){ ui.setBtnName( i, btn_name[i] ); ui.setBtnName( 4 + i, "MAX", "OFF" ); }
@@ -25,4 +21,4 @@ void loop( void ){
   if( ui.getEvent() != NO_EVENT ){ lcd.setBrightness( c_val[0] ); lcd.fillRect( 0, 0, 240, 140, lcd.color888( c_val[1], c_val[2], c_val[3] ) ); };
   ui.drawSliders( ui.getUiID("SLIDER_0"), &lcd, ui_sprite0 ); 
   ui.drawToggles( ui.getUiID("BTN_1"),    &lcd, ui_sprite1 ); delay(1);
-}//28行で完成！
+}//24行で完成！
