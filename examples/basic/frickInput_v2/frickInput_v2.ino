@@ -36,7 +36,7 @@ void loop( void ){
     lcd.setFont(&lgfxJapanGothicP_20);
     lcd.setTextWrap(true);
     lcd.setTextScroll(true);
-    lcd.printf( ui.getFlickStrings().c_str() );
+    lcd.printf( ui.getFlickString().c_str() );
 //    lcd.printf( ui.getFlickString(INVISIBLE).c_str() );//インビジブルモード（暗号化していません。）
     lcd.drawString( ui.getFlickChar(), 150,0 );
   }
