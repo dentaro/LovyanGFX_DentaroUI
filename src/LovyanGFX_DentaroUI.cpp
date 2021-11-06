@@ -20,7 +20,6 @@ void LovyanGFX_DentaroUI::begin( LGFX* _lcd , LGFX_Sprite& _flickUiSprite, int _
 
 void LovyanGFX_DentaroUI::begin( LGFX* _lcd)
 {
-
  lcdPos.x = 0;
  lcdPos.y = 0;
  
@@ -52,8 +51,6 @@ void LovyanGFX_DentaroUI::begin( LGFX* _lcd)
   
     _lcd->fillScreen(TFT_BLACK);
     _lcd->setColorDepth(COL_DEPTH);
-
-    
 
     if(use_flickUiSpriteF){ 
       createFlickBtns(_lcd, flickUiSprite);//フリック用のボタンを生成
@@ -202,7 +199,7 @@ void LovyanGFX_DentaroUI::update( LGFX* _lcd )
     }
   }
 }
-void LovyanGFX_DentaroUI::dentaroKeyUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _ui_sprite0, LGFX_Sprite& _ui_sprite1, LGFX_Sprite& _ui_sprite2, LGFX_Sprite& _flickUiSprite ){
+void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _ui_sprite0, LGFX_Sprite& _ui_sprite1, LGFX_Sprite& _ui_sprite2, LGFX_Sprite& _flickUiSprite ){
     if( getEvent() != NO_EVENT){ 
     if( getEvent() == TOUCH ){
 
@@ -217,6 +214,7 @@ void LovyanGFX_DentaroUI::dentaroKeyUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSpri
       }
 
       else if(getTouchBtnID() == 13){ //大小文字モード切替
+
         if(fpNo!=2&&fpNo!=3)fpNo=2;//英語モードでなければ切り替える
           else if(fpNo==2)fpNo=3;
           else if(fpNo==3)fpNo=2;
@@ -369,37 +367,37 @@ bool LovyanGFX_DentaroUI::nchr_cmp(const char* c1, const char* c2) {
 
 
 
-std::vector<std::string> LovyanGFX_DentaroUI::delete_mb(const char* src, const char* del) {
+// std::vector<std::string> LovyanGFX_DentaroUI::delete_mb(const char* src, const char* del) {
 
-  char tmp[10];
+//   char tmp[10];
 
-  std::vector<std::string> result;
+//   std::vector<std::string> result;
 
-  std::string tmps;
-  while (*src) {
+//   std::string tmps;
+//   while (*src) {
 
-    //デリミタを飛ばす
-    const char* p = src;
-    while (nchr_cmp(src, del) == true && *src != '\0')
-      src= next_c_mb(src);
+//     //デリミタを飛ばす
+//     const char* p = src;
+//     while (nchr_cmp(src, del) == true && *src != '\0')
+//       src= next_c_mb(src);
 
-    //デリミタに遭遇するまで文字を追加し続ける
-    while (nchr_cmp(src, del) != true && *src != '\0') {
+//     //デリミタに遭遇するまで文字を追加し続ける
+//     while (nchr_cmp(src, del) != true && *src != '\0') {
     
-    // while (i!=5) {
-      // for(int i=0;i<3;i++){
-      ngetc(tmp, src);//一文字取り出す
-      tmps += tmp;
-      src = next_c_mb(src);
-    }
-    if (tmps.size()) {
-      result.push_back(tmps);
-    }
-    tmps.clear();
-  }
+//     // while (i!=5) {
+//       // for(int i=0;i<3;i++){
+//       ngetc(tmp, src);//一文字取り出す
+//       tmps += tmp;
+//       src = next_c_mb(src);
+//     }
+//     if (tmps.size()) {
+//       result.push_back(tmps);
+//     }
+//     tmps.clear();
+//   }
 
-  return result;
-}
+//   return result;
+// }
 
 
 std::vector<std::string> LovyanGFX_DentaroUI::split_mb(const char* src, const char* del) {
@@ -1584,7 +1582,7 @@ return kanalist[_henkanListNo][_kanaShiftNo];
 } 
 
 
-void LovyanGFX_DentaroUI::setDentaroKeyPanels(){
+void LovyanGFX_DentaroUI::setFlickPanels(){
   //パネル番号、ボタン番号、表示文字９個
   //ui.setFlickPanel(0, 0, "あいうえおかきくけ");//9文字はいまのところ未対応
 
@@ -1656,7 +1654,11 @@ void LovyanGFX_DentaroUI::setDentaroKeyPanels(){
   setFlickPanel(4, 11, ".(=)");
   }
 
-  void LovyanGFX_DentaroUI::setDentaroKeyBtn(){
+  void LovyanGFX_DentaroUI::setFlick(){
+    setFlick(CHAR_3_BYTE);
+  }
+
+  void LovyanGFX_DentaroUI::setFlick(int _charMode){
     
     setBtnName( 12, "次へ" );
     setBtnName( 13, "a/A" );
@@ -1667,15 +1669,47 @@ void LovyanGFX_DentaroUI::setDentaroKeyPanels(){
     setBtnName( 17, "_" );
     setBtnName( 18, "Clr" );
     setBtnName( 19, "Ret" );
-    setCharMode(CHAR_3_BYTE);//日本語で初期化
+
+    
+    if(_charMode == CHAR_1_BYTE){
+      fpNo=2;//英語モードに切り替える
+    }else if(_charMode == NUMERIC){
+      fpNo=4;//数値モードに切り替える
+    }else{
+      setCharMode(_charMode);//指定のパネルモードに切り替える
+    }
+    setUiLabels( getUiID("FLICK_1"), fpNo );
+    // drawFlicks( getUiID("FLICK_1"), &_layoutSprite, _ui_sprite0 );
   }
 
-String LovyanGFX_DentaroUI::getDentaroFlickStrings(){
-  //return finalStr;
+String LovyanGFX_DentaroUI::getInvisibleFlickStrings(){
+  String invisibleStr = "";
+  //最後の文字のバイト数を判定する
+  setlocale(LC_ALL, "");
+  std::vector<std::string> ret = split_mb(flickStrDel.c_str(),"\n");
+
+  if(ret.size() >= 1){
+
+  for (size_t i = 0; i < ret.size()-1; i++) {
+    invisibleStr += "*";
+  }
+
+  invisibleStr += String(ret[ret.size()-1].c_str());
+  }
+
+  return invisibleStr;
+}
+
+String LovyanGFX_DentaroUI::getFlickString(bool _visibleMode){
+  if(_visibleMode == INVISIBLE)return getInvisibleFlickStrings();
+  else return flickStr;
+}
+
+String LovyanGFX_DentaroUI::getFlickString(){
   return flickStr;
 }
 
-String LovyanGFX_DentaroUI::getDentaroFlickChar(){
+String LovyanGFX_DentaroUI::getFlickChar(){
 
   String RetChar = "";
   if(!selectModeF){

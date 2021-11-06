@@ -20,9 +20,13 @@
 
 // #define MULTI_EVENT -1
 
-
-#define CHAR_3_BYTE 0
-#define CHAR_1_BYTE 1
+//開発者表記
+#define CHAR_3_BYTE 0//=JP
+#define CHAR_1_BYTE 2//=EN
+#define NUMERIC 4
+//ユーザー表記(Arduino側でしか使わない)
+#define JP 0
+#define EN 2
 
 #define SHOW_NAMED 0
 #define SHOW_ALL 1
@@ -41,6 +45,9 @@
 
 #define SHIFT_NUM 5//シフトパネルの数
 #define HENKAN_NUM 57
+
+#define VISIBLE true
+#define INVISIBLE false
 
 class RetClass {
 public:
@@ -375,11 +382,14 @@ public:
     void showInfo( LovyanGFX* _lgfx );
 
     String getHenkanChar(int _henkanListNo, int _kanaShiftNo);
-    void setDentaroKeyPanels();//キーボード用プリセット
-    void setDentaroKeyBtn();//キーボード用プリセッ；
-    void dentaroKeyUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _ui_sprite0, LGFX_Sprite& ui_sprite1, LGFX_Sprite& ui_sprite2, LGFX_Sprite& _flickUiSprite );
-    String getDentaroFlickStrings();
-    String getDentaroFlickChar();
+    void setFlickPanels();//キーボード用プリセット
+    void setFlick();//キーボード用プリセッ；
+    void setFlick(int _charMode);
+    void flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _ui_sprite0, LGFX_Sprite& ui_sprite1, LGFX_Sprite& ui_sprite2, LGFX_Sprite& _flickUiSprite );
+    String getInvisibleFlickStrings();
+    String getFlickString();
+    String getFlickString(bool _visibleMode);
+    String getFlickChar();
     String getKana(int _panelID, int _rowID, int _colID, int _transID);
 
 const char* next_c_mb(const char* c);
@@ -387,7 +397,7 @@ void ngetc(char* const dst,const char* src);
 bool nchr_cmp(const char* c1, const char* c2);
     std::vector<std::string> split_mb(const char* src, const char* del);
 
-    std::vector<std::string> delete_mb(const char* src, const char* del);
+    // std::vector<std::string> delete_mb(const char* src, const char* del);
     String delEndChar(String _str, int _ByteNum);
 
 //  getTouchingDist();//タッチしている距離を取得
