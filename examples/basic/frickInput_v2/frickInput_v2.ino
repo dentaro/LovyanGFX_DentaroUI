@@ -8,7 +8,7 @@ static LGFX_Sprite ui_sprite2( &layoutSprite );//右ボタン用
 static LGFX_Sprite flickUiSprite;//フリックパネル用
 void setup() {
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
-  ui.begin( &lcd, flickUiSprite, SHIFT_NUM, 24, 3, true );//lcd, フリックパネル, shiftの数, 色深度, 回転方向,タッチキャリブレーション
+  ui.begin( &lcd, flickUiSprite, SHIFT_NUM, 24, 0, true );//lcd, フリックパネル, shiftの数, 色深度, 回転方向,タッチキャリブレーション
   ui.createLayout( 0, 80, 240, 240, layoutSprite, MULTI_EVENT );
   ui.setFlickPanels();//フリックキーボード用プリセット
   ui.createFlicks( 48, 48,  144, 192, 3, 4, ui_sprite0, MULTI_EVENT );
