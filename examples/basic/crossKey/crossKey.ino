@@ -1,7 +1,3 @@
-#define LGFX_AUTODETECT
-#define LGFX_USE_V1
-#include <LovyanGFX.hpp>
-#include <LGFX_AUTODETECT.hpp>
 #include <LovyanGFX_DentaroUI.hpp>
 static LGFX lcd;
 LovyanGFX_DentaroUI ui( &lcd );
@@ -13,7 +9,7 @@ int x,y = 3;
 int c = TFT_GREEN;
 void setup() {
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
-  ui.begin( &lcd ); lcd.init(); lcd.begin(); lcd.setRotation( 0 ); lcd.setColorDepth( 24 );
+  ui.begin( &lcd, 24, 0, true );//lcd, 色深度,回転方向,タッチキャリブレーション
   ui.createBtns( 45, 170,  150, 150, 3, 3, ui_sprite0, TOUCH );
   for( int i=0; i < 4; i++ ){
     ui.setAvailableF( ui.getUiID("BTN_0"), btn_No[i], false ); //四隅のボタンを無反応に

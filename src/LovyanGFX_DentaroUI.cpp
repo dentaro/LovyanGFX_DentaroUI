@@ -7,6 +7,16 @@
 // lcd = _lcd;
 //}
 
+void LovyanGFX_DentaroUI::touchCalibration (bool _calibF){
+  touchCalibrationF = _calibF;
+}
+
+void LovyanGFX_DentaroUI::begin( LGFX* _lcd , LGFX_Sprite& _flickUiSprite, int _shiftNum, bool _calibF )
+{
+  touchCalibrationF = _calibF;
+  begin( _lcd , _flickUiSprite, _shiftNum );
+}
+
 void LovyanGFX_DentaroUI::begin( LGFX* _lcd , LGFX_Sprite& _flickUiSprite, int _shiftNum = 3 )
 {
   shiftNum = _shiftNum;
@@ -16,6 +26,27 @@ void LovyanGFX_DentaroUI::begin( LGFX* _lcd , LGFX_Sprite& _flickUiSprite, int _
   use_flickUiSpriteF = true;
   flickUiSprite = _flickUiSprite;
   begin(_lcd);
+}
+
+void LovyanGFX_DentaroUI::begin( LGFX* _lcd, bool _calibF ){
+  touchCalibrationF = _calibF;
+  begin( _lcd );
+}
+
+void LovyanGFX_DentaroUI::begin( LGFX* _lcd, int _colBit, int _rotateNo, bool _calibF ){
+ _lcd->init(); 
+ _lcd->begin(); 
+ _lcd->setColorDepth( _colBit );
+ begin( _lcd, _calibF ); 
+ _lcd->setRotation( _rotateNo ); 
+}
+
+void LovyanGFX_DentaroUI::begin( LGFX* _lcd, LGFX_Sprite& _flickUiSprite, int _SHIFT_NUM, int _colBit, int _rotateNo, bool _calibF ){
+  _lcd->init(); 
+  _lcd->begin(); 
+  _lcd->setColorDepth( _colBit );
+  begin( _lcd , _flickUiSprite, _SHIFT_NUM , _calibF ); //lcd, フリックパネル, shiftの数, タッチキャリブレーション
+  _lcd->setRotation( _rotateNo );
 }
 
 void LovyanGFX_DentaroUI::begin( LGFX* _lcd)
@@ -32,41 +63,43 @@ void LovyanGFX_DentaroUI::begin( LGFX* _lcd)
   //btnNum = _btnNum;
 
   // タッチが使用可能な場合のキャリブレーションを行います。（省略可）
-  if (_lcd->touch())
-  {
-    //renameFile(SPIFFS, "/config.txt", fileName);
-    if (_lcd->width() < _lcd->height()) _lcd->setRotation(_lcd->getRotation() ^ 1);
+  if(touchCalibrationF == true){
+    if (_lcd->touch())
+    {
+      //renameFile(SPIFFS, "/config.txt", fileName);
+      if (_lcd->width() < _lcd->height()) _lcd->setRotation(_lcd->getRotation() ^ 1);
 
-    // 画面に案内文章を描画します。
-    _lcd->setTextDatum(textdatum_t::middle_center);
-    _lcd->drawString("touch the arrow marker.", _lcd->width()>>1, _lcd->height() >> 1);
-    _lcd->setTextDatum(textdatum_t::top_left);
+      // 画面に案内文章を描画します。
+      _lcd->setTextDatum(textdatum_t::middle_center);
+      _lcd->drawString("touch the arrow marker.", _lcd->width()>>1, _lcd->height() >> 1);
+      _lcd->setTextDatum(textdatum_t::top_left);
 
-    // タッチを使用する場合、キャリブレーションを行います。画面の四隅に表示される矢印の先端を順にタッチしてください。
-    std::uint16_t fg = TFT_WHITE;
-    std::uint16_t bg = TFT_BLACK;
+      // タッチを使用する場合、キャリブレーションを行います。画面の四隅に表示される矢印の先端を順にタッチしてください。
+      std::uint16_t fg = TFT_WHITE;
+      std::uint16_t bg = TFT_BLACK;
+      
+      if (_lcd->isEPD()) std::swap(fg, bg);
+      _lcd->calibrateTouch(nullptr, fg, bg, std::max(_lcd->width(), _lcd->height()) >> 3);
     
-    if (_lcd->isEPD()) std::swap(fg, bg);
-    _lcd->calibrateTouch(nullptr, fg, bg, std::max(_lcd->width(), _lcd->height()) >> 3);
-  
-    _lcd->fillScreen(TFT_BLACK);
-    _lcd->setColorDepth(COL_DEPTH);
+      _lcd->fillScreen(TFT_BLACK);
+      _lcd->setColorDepth(COL_DEPTH);
 
-    if(use_flickUiSpriteF){ 
-      createFlickBtns(_lcd, flickUiSprite);//フリック用のボタンを生成
+      if(use_flickUiSpriteF){ 
+        createFlickBtns(_lcd, flickUiSprite);//フリック用のボタンを生成
+      }
+
+      //     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_SPIRAM)            : %6d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM) );
+      //     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
+      //     Serial.printf("heap_caps_get_largest_free_block(MALLOC_CAP_DMA):%d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA) );
+      //     Serial.printf("Width:%d, Height:%d\n", 256, 256);
+      // //    void *p = sprite1.createSprite(256, 256);
+      // //    if ( p == NULL ) {
+      // //      Serial.println("メモリが足りなくて確保できない");
+      // //    }
+      //     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
+      //     Serial.printf("heap_caps_get_largest_free_block(MALLOC_CAP_DMA):%d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA) );
     }
-     
-  
-//     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_SPIRAM)            : %6d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM) );
-//     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
-//     Serial.printf("heap_caps_get_largest_free_block(MALLOC_CAP_DMA):%d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA) );
-//     Serial.printf("Width:%d, Height:%d\n", 256, 256);
-// //    void *p = sprite1.createSprite(256, 256);
-// //    if ( p == NULL ) {
-// //      Serial.println("メモリが足りなくて確保できない");
-// //    }
-//     Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
-//     Serial.printf("heap_caps_get_largest_free_block(MALLOC_CAP_DMA):%d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA) );
+
   }
 
   //m_url = "/tokyo/15/29094/"+String(12902)+".png";
@@ -83,6 +116,8 @@ void LovyanGFX_DentaroUI::begin( LGFX* _lcd)
   Serial.println("");
   Serial.println("[UI_ID information]");
 }
+
+
 
 //void LovyanGFX_DentaroUI::update(LGFX& _lcd, int _mode){
 //  uiMode = _mode;
@@ -311,8 +346,6 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, L
         flickStrDel += finalChar+"\n";
         drawLayOut(_layoutSprite);
       }
-
-
     }
   }
 }
@@ -365,41 +398,6 @@ bool LovyanGFX_DentaroUI::nchr_cmp(const char* c1, const char* c2) {
   return issame;
 }
 
-
-
-// std::vector<std::string> LovyanGFX_DentaroUI::delete_mb(const char* src, const char* del) {
-
-//   char tmp[10];
-
-//   std::vector<std::string> result;
-
-//   std::string tmps;
-//   while (*src) {
-
-//     //デリミタを飛ばす
-//     const char* p = src;
-//     while (nchr_cmp(src, del) == true && *src != '\0')
-//       src= next_c_mb(src);
-
-//     //デリミタに遭遇するまで文字を追加し続ける
-//     while (nchr_cmp(src, del) != true && *src != '\0') {
-    
-//     // while (i!=5) {
-//       // for(int i=0;i<3;i++){
-//       ngetc(tmp, src);//一文字取り出す
-//       tmps += tmp;
-//       src = next_c_mb(src);
-//     }
-//     if (tmps.size()) {
-//       result.push_back(tmps);
-//     }
-//     tmps.clear();
-//   }
-
-//   return result;
-// }
-
-
 std::vector<std::string> LovyanGFX_DentaroUI::split_mb(const char* src, const char* del) {
 
   char tmp[10];
@@ -410,7 +408,7 @@ std::vector<std::string> LovyanGFX_DentaroUI::split_mb(const char* src, const ch
   while (*src) {
 
     //デリミタを飛ばす
-    const char* p = src;
+    // const char* p = src;
     while (nchr_cmp(src, del) == true && *src != '\0')
       src= next_c_mb(src);
 
@@ -701,67 +699,6 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX* _lgfx, LGFX_Sprite& _flickUi
 
 }
 
-
-// void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX* _lgfx, LGFX_Sprite& _flickUiSprite, int _btnID, bool _visible, bool _available )
-// {
-
-  
-//   int _x = getBtnPos(_btnID).x;
-//   int _y = getBtnPos(_btnID).y;
-
-//   //if(_visible){
-//     _flickUiSprite.setPivot( 0, 0 );//setPivot()で回転する場合の原点を指定します。初期値は左上の(0, 0)だと思います
-
-//     _flickUiSprite.fillScreen(TFT_RED);
-
-//     std::string panelText = flickPanel_text_list_0[_btnID].c_str();//ArduinoのString型をc_str()で、std::string型に直してから、渡す
-    
-
-//     for(int j = 0; j < 3; j++){
-//       for(int i = 0; i < 3; i++){
-
-//         _flickUiSprite.setTextSize(1);
-
-//         String drawName = panelText.substr((i*3+j)*3,3).c_str();//std::string型の状態で一文字切り出して、Stringに渡す
-        
-
-
-//         //flick_touch_btn_list[i*3+j]->btn_mode = BTN_MODE_FLICK;
-//         flick_touch_btn_list[i*3+j]->flickDraw( _flickUiSprite ); 
-//         _flickUiSprite.fillRoundRect(
-//           // flick_touch_btn_list[i]->getBtnPos().x, 
-//           // flick_touch_btn_list[i]->getBtnPos().y, 
-//             48*i, 
-//             48*j, 
-//             48,//flick_touch_btn_list[i]->getBtnSize().w, 
-//             48,//flick_touch_btn_list[i]->getBtnSize().h, 
-//             10, TFT_WHITE);
-
-//         if(drawName == NULL){
-//           drawName = String(i*3+j);
-//         }
-//           _flickUiSprite.setTextColor( TFT4_BLACK );
-//           _flickUiSprite.setFont(&lgfxJapanGothicP_12);
-//           // drawName = String(i*3+j);
-        
-//           int b_hw = 48/2;
-//           int b_hh = 48/2;
-//           float b_str_hw = _flickUiSprite.textWidth( drawName ) / 2;
-//           _flickUiSprite.drawString( drawName, 48*i + b_hw - b_str_hw , 48*j + b_hh - 4 );
-        
-//       }
-//     }
-//     // _flickUiSprite.fillRoundRect(0, 0, 50, 50, 10, TFT_WHITE);
-//     // _flickUiSprite.pushSprite(_lgfx, _x, _y);
-//   // }
-//   // else if(!_visible){
-    
-//     //_flickUiSprite.fillRoundRect(flick_touch_btn_list[i]->, 0, 48, 48, 10, TFT_WHITE);
-//     _flickUiSprite.pushSprite(_lgfx, _x, _y);
-//   // }
-
-// }
-
 void LovyanGFX_DentaroUI::setLayoutSpritePos(int _LayoutSpritePosx, int _LayoutSpritePosy){
   layoutSpritePos = getTouchPoint(_LayoutSpritePosx, _LayoutSpritePosy);
 }
@@ -801,21 +738,34 @@ void LovyanGFX_DentaroUI::createBtns(int _uiSprite_x, int _uiSprite_y, int _w,in
 
       touch_btn_list[p_btnID] = NULL;
       touch_btn_list[p_btnID] = new TouchBtn( lcd ); 
-      touch_btn_list[p_btnID]->initBtn(p_btnID, String(p_btnID),
-      i*b_w,
-      j*b_h,
-      b_w,
-      b_h, 
-      String(p_btnID), 
-      layoutSpritePos, 
-      getTouchPoint(_uiSprite_x, _uiSprite_y), 
-      _uiSprite,
-      TOUCH_BTN_MODE);
 
-      // touch_btn_list[ _startId + j*uiBoxes[uiID].row + i ]->setVisibleF( _btnVisibleF );
-      // touch_btn_list[ _startId + j*uiBoxes[uiID].row + i ]->setAvailableF( _btnAvailableF );
+      if(toggle_mode == false){
+        touch_btn_list[p_btnID]->initBtn(p_btnID, String(p_btnID),
+        i*b_w,
+        j*b_h,
+        b_w,
+        b_h, 
+        String(p_btnID), 
+        layoutSpritePos, 
+        getTouchPoint(_uiSprite_x, _uiSprite_y), 
+        _uiSprite,
+        TOUCH_BTN_MODE);
+      }
+      else if(toggle_mode == true){
+        touch_btn_list[p_btnID]->initBtn(p_btnID, String(p_btnID),
+        i*b_w,
+        j*b_h,
+        b_w,
+        b_h, 
+        String(p_btnID), 
+        layoutSpritePos, 
+        getTouchPoint(_uiSprite_x, _uiSprite_y), 
+        _uiSprite,
+        TOUCH_TOGGLE_MODE);
+      }
+
       
-      //ベータ版は基本true
+
       touch_btn_list[ p_btnID ]->setVisibleF( true );
       touch_btn_list[ p_btnID ]->setAvailableF( true );
 
@@ -1213,6 +1163,7 @@ void LovyanGFX_DentaroUI::createFlicks(int _uiSprite_x, int _uiSprite_y, int _w,
       getTouchPoint(_uiSprite_x, _uiSprite_y), 
       _uiSprite,
       TOUCH_FLICK_MODE);
+      
 
       // touch_btn_list[ p_btnID ]->setVisibleF( _btnVisibleF );
       // touch_btn_list[ p_btnID ]->setAvailableF( _btnAvailableF );
@@ -1298,21 +1249,6 @@ void LovyanGFX_DentaroUI::addHandler( int _btnID, DelegateBase2* _func, uint16_t
   if( parentID == PARENT_LCD ) touch_btn_list[_btnID]->run2( _btnID, sp, tp, eventState, runEventNo);//ボタン内のイベントかチェック
   else if( parentID == PARENT_SPRITE ) touch_btn_list[_btnID]->run2( _btnID, sp, tp, eventState, runEventNo);//ボタン内のイベントかチェック
   
-//  if(_btnID >= 0 && _btnID < 40 ){//キーボード
-//    touch_btn_list[_btnID].run2( _btnID, sp, tp, eventState, runEventNo, lcdPos );//ボタン内のイベントかチェック
-//  }
-//  else if(_btnID == 40 || _btnID == 41 ){//＋‐ボタン
-//    touch_btn_list[_btnID].run2( _btnID, sp, tp, eventState, runEventNo, layoutSpritePos );//ボタン内のイベントかチェック
-//  }
-//  else if(_btnID == 42 ){//Tile
-//    touch_btn_list[_btnID].run2( _btnID, sp, tp, eventState, runEventNo, layoutSpritePos );//ボタン内のイベントかチェック
-//  }
-//  else if(_btnID == 43 || _btnID == 44 ){//SLIDER
-//    touch_btn_list[_btnID].run2( _btnID, sp, tp, eventState, runEventNo, lcdPos );//ボタン内のイベントかチェック
-//  }
-//  else if(_btnID == 45 || _btnID == 46 ){//TOGGLE
-//    touch_btn_list[_btnID].run2( _btnID, sp, tp, eventState, runEventNo, lcdPos );//ボタン内のイベントかチェック
-//  }
   touch_btn_list[_btnID]->delHandlers2();
 }
 
@@ -1334,11 +1270,6 @@ int LovyanGFX_DentaroUI::getPreEvent()
 {
   return preEventState;
 }
-
-// int LovyanGFX_DentaroUI::getTouchEvent()
-// {
-//   return eventState;
-// }
 
 void LovyanGFX_DentaroUI::circle(LovyanGFX* _lgfx,  uint16_t c, int fillF) 
 {
@@ -1412,10 +1343,6 @@ lgfx::v1::touch_point_t LovyanGFX_DentaroUI::getTouchPoint(int _x, int _y){
   return tp;
 }
 
-// float LovyanGFX_DentaroUI::getSliderVal(int _btnID, int _xy){
-//  return touch_btn_list[_btnID].sliderValy;
-// }
-
 float LovyanGFX_DentaroUI::getSliderVal(int uiID, int _btnNo){
   float retVal = 1.0;
   int _btnID = uiBoxes[uiID].b_sNo + _btnNo;
@@ -1456,19 +1383,10 @@ int LovyanGFX_DentaroUI::getCharMode(){
   return charMode;
 }
 
-
 bool LovyanGFX_DentaroUI::getToggleVal(int _uiID, int _btnNo){
   int _btnID = uiBoxes[uiID].b_sNo + _btnNo;
   return touch_btn_list[_btnID]->getToggleVal();
 }
-
-// lgfx::v1::touch_point_t LovyanGFX_DentaroUI::getSliderPos(int uiID, int _btnNo){
-//   lgfx::v1::touch_point_t tp;
-//   tp.x = _x;
-//   tp.y = _y;
-//   return tp;
-// }
-
 
 int LovyanGFX_DentaroUI::getUiFirstNo(int uiID){
   return uiBoxes[uiID].b_sNo;
@@ -1477,7 +1395,6 @@ int LovyanGFX_DentaroUI::getUiFirstNo(int uiID){
 int LovyanGFX_DentaroUI::getflickPanelBtnNo(int uiID){
   return flickPanels[uiID]->b_No;
 }
-
 
 int LovyanGFX_DentaroUI::getUiBtnNum(int uiID){
   return uiBoxes[uiID].b_num;
@@ -1508,10 +1425,6 @@ lgfx::v1::touch_point_t LovyanGFX_DentaroUI::getBtnPos(int _btnID){
   return getTouchPoint(touch_btn_list[_btnID]->getBtnPos().x, touch_btn_list[_btnID]->getBtnPos().y); 
 }
 
-// void LovyanGFX_DentaroUI::setShowFlickPanelNo(int _showFlickPanelNo){
-//   showFlickPanelNo = _showFlickPanelNo;
-// }
-
 void LovyanGFX_DentaroUI::setUiLabels(int uiID, int _showFlickPanelNo)
 {
   showFlickPanelNo = _showFlickPanelNo;
@@ -1526,7 +1439,6 @@ void LovyanGFX_DentaroUI::setUiLabels(int uiID, int _showFlickPanelNo)
       touch_btn_list[p_btnID]->setBtnName(str);
     }
   }
-
 }
 
 void LovyanGFX_DentaroUI::showInfo(LGFX& _lgfx ){

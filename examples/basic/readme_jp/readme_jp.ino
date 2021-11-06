@@ -1,12 +1,7 @@
-//LovyanGFXの設定です。2021年10月時点での動作を確認しています。
-#define LGFX_AUTODETECT //デバイスの自動認識 (D-duino-32 XS, PyBadge はパネルID読取りが出来ないため自動認識の対象から外れています)
-#define LGFX_USE_V1//新しいバージョンを使う
+//LovyanGFXの設定です。2021年11月時点での動作を確認しています。
 
-#include <LovyanGFX.hpp>//LovyanGFXライブラリを読み込む
-#include <LGFX_AUTODETECT.hpp>  //クラス"LGFX"を準備します
-
-//ESP32などの自作デバイス派の人は、AUTODETECTを使用せず、LGFX_ESP32_sample.hppにピンアサインなどの設定を書き込んで読み込んでください。
-//#include "LGFX_ESP32_sample.hpp"
+//ESP32などの自作デバイス派の人は、TouchBtn.hppを開き、コメントアウトし直してください。
+//AUTODETECTを使用せず、LGFX_ESP32_custom.hppにピンアサインなどの設定を書き込むことで使えるようになります。
 
 //でんたろう自作UIライブラリを読み込みます。LovyanGFXがないと動きません。
 #include <LovyanGFX_DentaroUI.hpp>
@@ -32,11 +27,7 @@ void setup() {
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
   //lcd.init();lcd.begin();lcd.setRotation(1);lcd.setColorDepth(24);//ここでlcd関係を宣言するとなぜかタッチパネルキャリブレーションができます。
   ui.begin( &lcd );//uiを使うための準備
-  lcd.init();//initとbeginはどちらかだけでも動くようです。
-  lcd.begin();
-  lcd.setRotation(0);//描画面の回転ができます。
-  lcd.setColorDepth(24);// RGB888の24ビットに設定(表示される色数はパネル性能によりRGB666の18ビットになります)
-
+  ui.begin( &lcd, 24, 3, true );//lcd, 色深度,回転方向,タッチキャリブレーションの有無
   ui.createSliders( 0,   140, 180, 180, 1, 4, ui_sprite0, X_VAL, MULTI_EVENT);
   //スライダ用の箱を用意(x,y,w,h)し、x方向1列、y方向4行に区切ったスライダを生成します。
   //X方向の値（X_VAL）を利用します。

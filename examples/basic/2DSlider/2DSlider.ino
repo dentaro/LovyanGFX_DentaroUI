@@ -1,7 +1,4 @@
-#define LGFX_AUTODETECT
-#define LGFX_USE_V1
-#include <LovyanGFX.hpp>
-#include <LGFX_AUTODETECT.hpp>
+//LovyanGFXライブラリがないと動きません。
 #include <LovyanGFX_DentaroUI.hpp>
 #define SLIDER_NO_0 0
 #define SLIDER_NO_1 1
@@ -10,7 +7,7 @@ LovyanGFX_DentaroUI ui( &lcd );
 static LGFX_Sprite ui_sprite0( &lcd );//スライダ用
 void setup(){
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
-  ui.begin( &lcd ); lcd.init(); lcd.begin(); lcd.setRotation( 0 ); lcd.setColorDepth( 24 );
+  ui.begin( &lcd, 24, 0, true );//lcd, 色深度,回転方向,タッチキャリブレーション
   ui.createSliders( 0, 160, 240, 160, 2, 1, ui_sprite0, XY_VAL, MULTI_EVENT );
   ui.setBtnName( ui.getUiID("SLIDER_0"), "2DSlider0" );
   ui.setBtnName( ui.getUiID("SLIDER_0")+1, "2DSlider1" );
