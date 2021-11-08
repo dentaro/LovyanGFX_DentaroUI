@@ -380,6 +380,8 @@ public:
     // std::vector<std::string> delete_mb(const char* src, const char* del);
     String delEndChar(String _str, int _ByteNum);
 
+    void delChar();
+
 //  getTouchingDist();//タッチしている距離を取得
 //  getTouchingTime();//タッチしている時間を取得
 };
