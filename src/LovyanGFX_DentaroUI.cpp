@@ -281,7 +281,7 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, L
       if(getTouchBtnID() == 12){//次へNxt
       selectModeF =false;
 
-        if(charMode == CHAR_3_BYTE ){
+        if(charMode == CHAR_3_BYTE ){//日本語入力の時
 
           curKanaColNo++;
           curKanaColNo%=5; 
@@ -291,11 +291,21 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, L
             flickStr += finalChar;
             flickStrDel += finalChar+"\n";
           }
+        }else if(charMode == CHAR_1_BYTE ){//英語入力の時
+          curKanaColNo++;
+          curKanaColNo%=5; 
+          finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,0);
+          if(finalChar!="無"){
+            delChar();
+            // flickStr = delEndChar(flickStr, 1);
+            flickStr += finalChar;
+            flickStrDel += finalChar+"\n";
+          }
         }
       }
       if(getTouchBtnID() == 15){//変換
       selectModeF =true;
-        if(charMode == CHAR_3_BYTE ){
+        if( charMode == CHAR_3_BYTE ){
           kanaShiftNo++; 
           kanaShiftNo%=3;
           finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,kanaShiftNo);
@@ -333,7 +343,9 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, L
           }
         }
 
-      }else if(getTouchBtnID() == 17){flickStr +="　";//空白
+      }else if(getTouchBtnID() == 17){
+        if( charMode == CHAR_3_BYTE )flickStr +="　";//全角空白（日本語のとき）
+          else flickStr +=" ";//半角空白
       }else if(getTouchBtnID() == 18){flickStr = ""; flickStrDel = "";//クリアfinalStr = "";finalStrDel = "";
       }else if(flickStr.length() >= 72){flickStr = "";//24文字を超えたらfinalStr = "";
       }else 
@@ -350,25 +362,56 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, L
   }
 }
 
+void LovyanGFX_DentaroUI::delChar(){
+  //最後の文字のバイト数を判定する
+  setlocale(LC_ALL, "");
+  std::vector<std::string> ret = split_mb(flickStrDel.c_str(),"\n");
+
+  if(ret.size() >= 1){
+  //バイト数分消去
+  flickStr = delEndChar(flickStr, ret[ret.size()-1].length());//一字分のバイト数削る
+
+  //flickStrDelも更新（最後の字+ "\n"を削除）
+    flickStrDel = "";
+    for (size_t i = 0; i < ret.size()-1; i++) {
+      flickStrDel += String(ret[i].c_str()) + "\n";
+    }
+  }
+}
+
 String LovyanGFX_DentaroUI::getKana(int _panelID, int _rowID, int _colID, int _transID){
   String str="";
-  String planeStr ="";
   std::string stdstr = "";
   stdstr = flickPanels[showFlickPanelNo]->text_list[_rowID].c_str();
-  planeStr = stdstr.substr(_colID*3, 3).c_str();
-  str = stdstr.substr(_colID*3, 3).c_str();
 
-  if(str != "ま"||planeStr != "な"){
-  if(_transID == 1||_transID == 2){
-    int i = 0;
-    while(planeStr!= getHenkanChar(i, 0)||i>HENKAN_NUM-1){
-      i++;
-      if(i>HENKAN_NUM-1)break;
+  if( charMode == CHAR_3_BYTE )
+  {
+    String planeStr ="";
+    
+
+    
+    planeStr = stdstr.substr(_colID*3, 3).c_str();
+    str = stdstr.substr(_colID*3, 3).c_str();
+
+    if(str != "ま"||planeStr != "な"){
+      if(_transID == 1||_transID == 2){
+        int i = 0;
+        while(planeStr!= getHenkanChar(i, 0)||i>HENKAN_NUM-1){
+          i++;
+          if(i>HENKAN_NUM-1)break;
+        }
+        if(i < HENKAN_NUM && getHenkanChar(i, _transID).c_str()!=NULL)str = getHenkanChar(i, _transID).c_str();
+        else str = "無";
+      }
     }
-    if(i < HENKAN_NUM && getHenkanChar(i, _transID).c_str()!=NULL)str = getHenkanChar(i, _transID).c_str();
-    else str = "無";
+  
   }
+  else if( charMode == CHAR_1_BYTE )
+  {
+    str = stdstr.substr(_colID, 1).c_str();
   }
+
+  
   return str;
 }
 
@@ -559,7 +602,7 @@ String LovyanGFX_DentaroUI::getFlickStr(){
               }
               
               if(angle <= 112.5 && angle > 67.5&&trimText.length()>=5){
-                flickString = trimText.substr(4,1).c_str();//お
+                flickString = trimText.substr(4,1).c_str();//E
               }
 
               if(angle <= 202.5 && angle > 157.5&&trimText.length()>=2){
@@ -1499,6 +1542,7 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
   //ui.setFlickPanel(0, 0, "あいうえおかきくけ");//9文字はいまのところ未対応
 
   setCharMode(CHAR_3_BYTE);
+  //全角5文字になるように空白を入れて文字を登録
   setFlickPanel(0, 0, "あいうえお");//第一引数はSHIFT_ID
   setFlickPanel(0, 1, "かきくけこ");
   setFlickPanel(0, 2, "さしすせそ");
@@ -1508,7 +1552,7 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
   setFlickPanel(0, 6, "まみむめも");
   setFlickPanel(0, 7, "や「ゆ」よ");
   setFlickPanel(0, 8, "らりるれろ");
-  setFlickPanel(0, 9, "？？？？？");
+  setFlickPanel(0, 9, "～（・）　");
   setFlickPanel(0, 10, "わをんー　");
   setFlickPanel(0, 11, "、。？！　");
 
@@ -1521,49 +1565,50 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
   setFlickPanel(1, 6, "マミムメモ");
   setFlickPanel(1, 7, "ヤ「ユ」ヨ");
   setFlickPanel(1, 8, "ラリルレロ");
-  setFlickPanel(1, 9, "？？？？？");
+  setFlickPanel(1, 9, "％＆￥―　");
   setFlickPanel(1, 10, "ワヲンー　");
   setFlickPanel(1, 11, "、。？！　");
 
   setCharMode(CHAR_1_BYTE);
-  setFlickPanel(2, 0, "@#/&_");
-  setFlickPanel(2, 1, "ABC");
-  setFlickPanel(2, 2, "DEF");
-  setFlickPanel(2, 3, "GHI");
-  setFlickPanel(2, 4, "JKL");
-  setFlickPanel(2, 5, "MNO");
-  setFlickPanel(2, 6, "PQRS");
-  setFlickPanel(2, 7, "TUV");
-  setFlickPanel(2, 8, "WXYZ");
-  setFlickPanel(2, 9, "+-*/");//toggleボタンに
-  setFlickPanel(2, 10, "'\"()");
-  setFlickPanel(2, 11, ".,?!");
+  //半角5文字になるように空白を入れて文字を登録
+  setFlickPanel(2, 0, "@#%&_");
+  setFlickPanel(2, 1, "ABC  ");
+  setFlickPanel(2, 2, "DEF  ");
+  setFlickPanel(2, 3, "GHI  ");
+  setFlickPanel(2, 4, "JKL  ");
+  setFlickPanel(2, 5, "MNO  ");
+  setFlickPanel(2, 6, "PQRS ");
+  setFlickPanel(2, 7, "TUV  ");
+  setFlickPanel(2, 8, "WXYZ ");
+  setFlickPanel(2, 9, "^[$] ");//toggleボタンに
+  setFlickPanel(2, 10, "'<\"> ");
+  setFlickPanel(2, 11, ".,?! ");
 
-  setFlickPanel(3, 0, "@#/&_");
-  setFlickPanel(3, 1, "abc");
-  setFlickPanel(3, 2, "def");
-  setFlickPanel(3, 3, "ghi");
-  setFlickPanel(3, 4, "jkl");
-  setFlickPanel(3, 5, "mno");
-  setFlickPanel(3, 6, "pqrs");
-  setFlickPanel(3, 7, "tuv");
-  setFlickPanel(3, 8, "wxyz");
-  setFlickPanel(3, 9, "+-*/");
-  setFlickPanel(3, 10, "'(\")");
-  setFlickPanel(3, 11, ".,?!");
+  setFlickPanel(3, 0, "@#%&_");
+  setFlickPanel(3, 1, "abc  ");
+  setFlickPanel(3, 2, "def  ");
+  setFlickPanel(3, 3, "ghi  ");
+  setFlickPanel(3, 4, "jkl  ");
+  setFlickPanel(3, 5, "mno  ");
+  setFlickPanel(3, 6, "pqrs ");
+  setFlickPanel(3, 7, "tuv  ");
+  setFlickPanel(3, 8, "wxyz ");
+  setFlickPanel(3, 9, "-(/) ");
+  setFlickPanel(3, 10, ":;'\" ");
+  setFlickPanel(3, 11, ".,?! ");
 
-  setFlickPanel(4, 0, "0");
-  setFlickPanel(4, 1, "1");
-  setFlickPanel(4, 2, "2");
-  setFlickPanel(4, 3, "3");
-  setFlickPanel(4, 4, "4");
-  setFlickPanel(4, 5, "5");
-  setFlickPanel(4, 6, "6");
-  setFlickPanel(4, 7, "7");
-  setFlickPanel(4, 8, "8");
-  setFlickPanel(4, 9, "9");
-  setFlickPanel(4, 10, "+-*/");
-  setFlickPanel(4, 11, ".(=)");
+  setFlickPanel(4, 0, "0    ");
+  setFlickPanel(4, 1, "1    ");
+  setFlickPanel(4, 2, "2    ");
+  setFlickPanel(4, 3, "3    ");
+  setFlickPanel(4, 4, "4    ");
+  setFlickPanel(4, 5, "5    ");
+  setFlickPanel(4, 6, "6    ");
+  setFlickPanel(4, 7, "7    ");
+  setFlickPanel(4, 8, "8    ");
+  setFlickPanel(4, 9, "9    ");
+  setFlickPanel(4, 10, "+-*/ ");
+  setFlickPanel(4, 11, ".(=) ");
   }
 
   void LovyanGFX_DentaroUI::setFlick(){
