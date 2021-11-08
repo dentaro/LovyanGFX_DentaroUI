@@ -1617,7 +1617,7 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
 
   void LovyanGFX_DentaroUI::setFlick(int _charMode){
     
-    setBtnName( 12, "次へ" );
+    setBtnName( 12, "Nxt" );
     setBtnName( 13, "a/A" );
     
     setBtnName( 14, "SFT" );
