@@ -280,21 +280,38 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, L
 
       if(getTouchBtnID() == 12){//次へNxt
       selectModeF =false;
-
         if(charMode == CHAR_3_BYTE ){//日本語入力の時
+          finalChar = "";
 
           curKanaColNo++;
-          curKanaColNo%=5; 
+          curKanaColNo%=5;
           finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,kanaShiftNo);
+
+          while(String("　") == finalChar){
+            curKanaColNo++;
+            curKanaColNo%=5;
+            finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,kanaShiftNo);
+          }
+
           if(finalChar!="無"){
             flickStr = delEndChar(flickStr, 3);
             flickStr += finalChar;
             flickStrDel += finalChar+"\n";
           }
         }else if(charMode == CHAR_1_BYTE ){//英語入力の時
+
+          finalChar = "";
+
           curKanaColNo++;
-          curKanaColNo%=5; 
+          curKanaColNo%=5;
           finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,0);
+
+          while(String(" ") == finalChar){
+            curKanaColNo++;
+            curKanaColNo%=5;
+            finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,0);
+          }
+
           if(finalChar!="無"){
             delChar();
             // flickStr = delEndChar(flickStr, 1);
@@ -1571,7 +1588,7 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
 
   setCharMode(CHAR_1_BYTE);
   //半角5文字になるように空白を入れて文字を登録
-  setFlickPanel(2, 0, "@#%&_");
+  setFlickPanel(2, 0, "@#|&_");
   setFlickPanel(2, 1, "ABC  ");
   setFlickPanel(2, 2, "DEF  ");
   setFlickPanel(2, 3, "GHI  ");
