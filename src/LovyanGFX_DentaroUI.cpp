@@ -280,21 +280,38 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, L
 
       if(getTouchBtnID() == 12){//次へNxt
       selectModeF =false;
-
         if(charMode == CHAR_3_BYTE ){//日本語入力の時
+          finalChar = "";
 
           curKanaColNo++;
-          curKanaColNo%=5; 
+          curKanaColNo%=5;
           finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,kanaShiftNo);
+
+          while(String("　") == finalChar){
+            curKanaColNo++;
+            curKanaColNo%=5;
+            finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,kanaShiftNo);
+          }
+
           if(finalChar!="無"){
             flickStr = delEndChar(flickStr, 3);
             flickStr += finalChar;
             flickStrDel += finalChar+"\n";
           }
         }else if(charMode == CHAR_1_BYTE ){//英語入力の時
+
+          finalChar = "";
+
           curKanaColNo++;
-          curKanaColNo%=5; 
+          curKanaColNo%=5;
           finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,0);
+
+          while(String(" ") == finalChar){
+            curKanaColNo++;
+            curKanaColNo%=5;
+            finalChar = getKana( showFlickPanelNo,curKanaRowNo,curKanaColNo,0);
+          }
+
           if(finalChar!="無"){
             delChar();
             // flickStr = delEndChar(flickStr, 1);
@@ -387,8 +404,6 @@ String LovyanGFX_DentaroUI::getKana(int _panelID, int _rowID, int _colID, int _t
   if( charMode == CHAR_3_BYTE )
   {
     String planeStr ="";
-    
-
     
     planeStr = stdstr.substr(_colID*3, 3).c_str();
     str = stdstr.substr(_colID*3, 3).c_str();
@@ -537,12 +552,12 @@ void LovyanGFX_DentaroUI::changeBtnMode(int _uiID, int _btnID, int _btn_mode){
   //flick_touch_btn_list[ _btnID ]->btn_mode = _btn_mode;
 }
 
-void LovyanGFX_DentaroUI::setFlickPanel(int _flickPanelID, int _btnID, String _btnsString, int _btn_mode){
-  // flick_touch_btn_list[ _btnID ]->btn_mode = _btn_mode;
-  // setFlickPanel(_flickPanelID, _btnID, _btnsString);
-}
+// void LovyanGFX_DentaroUI::setFlickPanel(int _flickPanelID, int _btnID, String _btnsString, int _btn_mode){
+//   // flick_touch_btn_list[ _btnID ]->btn_mode = _btn_mode;
+//   // setFlickPanel(_flickPanelID, _btnID, _btnsString);
+// }
 
-void LovyanGFX_DentaroUI::setFlickPanel(int _flickPanelID, int _btnID, String _btnsString){
+void LovyanGFX_DentaroUI::setFlickPanel( int _flickPanelID, int _btnID, String _btnsString ){
   flickPanels[_flickPanelID]->text_list[_btnID] = _btnsString;
 }
 
@@ -563,27 +578,54 @@ String LovyanGFX_DentaroUI::getFlickStr(){
       if(charMode == CHAR_3_BYTE){//日本語3ビットの場合
         //５文字の場合
         if(dist>24){
-          if(angle <= 22.5 || angle > 337.5){
-            flickString = trimText.substr(3*3,3).c_str();//え
-            curKanaColNo = 3;
-          }else if(angle <= 67.5 && angle > 22.5){
-            //flickString = trimText.substr(2*3,3).c_str();//
-          }else if(angle <= 112.5 && angle > 67.5){
-            flickString = trimText.substr(4*3,3).c_str();//お
-            curKanaColNo = 4;
-          }else if(angle <= 157.5 && angle > 112.5){
-            //flickString = trimText.substr(2*3,3).c_str();//
-          }else if(angle <= 202.5 && angle > 157.5){
-            flickString = trimText.substr(1*3,3).c_str();//い
-            curKanaColNo = 1;
-          }else if(angle <= 247.5 && angle > 202.5){
-            //flickString = trimText.substr(2*3,3).c_str();//
-          }else if(angle <= 292.5 && angle > 247.5){
-            flickString = trimText.substr(2*3,3).c_str();//う
-            curKanaColNo = 2;
-          }else if(angle <= 337.5 && angle > 292.5){
-            //flickString = trimText.substr(2*3,3).c_str();//
+
+          if(gettingText.size() == 15)//5文字以下
+          {
+            charNumMode  = CHAR_3_BYTE_5;//5文字
+            if(angle <= 22.5 || angle > 337.5){
+              flickString = trimText.substr(3*3,3).c_str();//え
+              curKanaColNo = 3;
+            }else if(angle <= 112.5 && angle > 67.5){
+              flickString = trimText.substr(4*3,3).c_str();//お
+              curKanaColNo = 4;
+            }else if(angle <= 202.5 && angle > 157.5){
+              flickString = trimText.substr(1*3,3).c_str();//い
+              curKanaColNo = 1;
+            }else if(angle <= 292.5 && angle > 247.5){
+              flickString = trimText.substr(2*3,3).c_str();//う
+              curKanaColNo = 2;
+            }
           }
+          else if(gettingText.size() == 27)//9文字
+          {
+            charNumMode  = CHAR_3_BYTE_9;//9文字
+            if(angle <= 22.5 || angle > 337.5){
+              flickString = trimText.substr(5*3,3).c_str();//か
+              curKanaColNo = 5;
+            }else if(angle <= 112.5 && angle > 67.5){
+              flickString = trimText.substr(7*3,3).c_str();//く
+              curKanaColNo = 7;
+            }else if(angle <= 202.5 && angle > 157.5){
+              flickString = trimText.substr(1*3,3).c_str();//い
+              curKanaColNo = 1;
+            }else if(angle <= 292.5 && angle > 247.5){
+              flickString = trimText.substr(3*3,3).c_str();//え
+              curKanaColNo = 3;
+            }else if(angle <= 67.5 && angle > 22.5){
+              flickString = trimText.substr(6*3,3).c_str();//き
+              curKanaColNo = 6;
+            }else if(angle <= 157.5 && angle > 112.5){
+              flickString = trimText.substr(8*3,3).c_str();//け
+              curKanaColNo = 8;
+            }else if(angle <= 247.5 && angle > 202.5){
+              flickString = trimText.substr(2*3,3).c_str();//う
+              curKanaColNo = 2;
+            }else if(angle <= 337.5 && angle > 292.5){
+              flickString = trimText.substr(4*3,3).c_str();//お
+              curKanaColNo = 4;
+            }
+          }
+
         }else if(dist<=24){
           flickString = trimText.substr(0,3).c_str();//あ
           curKanaColNo = 0;
@@ -595,6 +637,7 @@ String LovyanGFX_DentaroUI::getFlickStr(){
 
           if(gettingText.size() <= 5)//1バイト文字5文字（英語）以下の場合
           {
+            charNumMode  = CHAR_1_BYTE_5;//5文字
             flickString = "";
               if(angle <= 22.5 || angle > 337.5){
                 if(trimText.length()>=4)
@@ -612,6 +655,55 @@ String LovyanGFX_DentaroUI::getFlickStr(){
               if(angle <= 292.5 && angle > 247.5&&trimText.length()>=3){
                 flickString = trimText.substr(2,1).c_str();//C
               }
+          }
+
+          if(gettingText.size() == 9)//1バイト文字5文字（英語）以下の場合
+          {
+            charNumMode  = CHAR_1_BYTE_9;//9文字
+            flickString = "";
+              // if(angle <= 22.5 || angle > 337.5){
+              //   if(trimText.length()>=4)
+              //   flickString = trimText.substr(3,1).c_str();//D
+              // }
+              
+              // if(angle <= 112.5 && angle > 67.5&&trimText.length()>=5){
+              //   flickString = trimText.substr(4,1).c_str();//E
+              // }
+
+              // if(angle <= 202.5 && angle > 157.5&&trimText.length()>=2){
+              //   flickString = trimText.substr(1,1).c_str();//B
+              // }
+
+              // if(angle <= 292.5 && angle > 247.5&&trimText.length()>=3){
+              //   flickString = trimText.substr(2,1).c_str();//C
+              // }
+
+            if(angle <= 22.5 || angle > 337.5){
+              flickString = trimText.substr(5,1).c_str();//かF
+              // curKanaColNo = 5;
+            }else if(angle <= 112.5 && angle > 67.5){
+              flickString = trimText.substr(7,1).c_str();//くH
+              // curKanaColNo = 7;
+            }else if(angle <= 202.5 && angle > 157.5){
+              flickString = trimText.substr(1,1).c_str();//いB
+              // curKanaColNo = 1;
+            }else if(angle <= 292.5 && angle > 247.5){
+              flickString = trimText.substr(3,1).c_str();//えD
+              // curKanaColNo = 3;
+            }else if(angle <= 67.5 && angle > 22.5){
+              flickString = trimText.substr(6,1).c_str();//きG
+              // curKanaColNo = 6;
+            }else if(angle <= 157.5 && angle > 112.5){
+              flickString = trimText.substr(8,1).c_str();//けI
+              // curKanaColNo = 8;
+            }else if(angle <= 247.5 && angle > 202.5){
+              flickString = trimText.substr(2,1).c_str();//うC
+              // curKanaColNo = 2;
+            }else if(angle <= 337.5 && angle > 292.5){
+              flickString = trimText.substr(4,1).c_str();//おE
+              // curKanaColNo = 4;
+            }
+
           }
 
         }else if(dist<=24){
@@ -651,6 +743,23 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX* _lgfx, LGFX_Sprite& _flickUi
           {5,2,6,
            1,0,3,
            8,4,7};
+          if(swapArray[i] < gettingText.size())
+          {
+            trimText = gettingText; panelText += trimText.substr(swapArray[i],1);
+            panelText += " ";panelText += " ";
+          }else{
+            panelText += "　";
+          }
+        }
+      }
+      else if(gettingText.size() == 9)//1バイト文字9文字（英語）以下の場合
+      {
+        panelText ="";
+        for(int i=0; i<9; i++){
+          int swapArray[9] = 
+          {2,3,4,
+           1,0,5,
+           8,7,6};
           if(swapArray[i] < gettingText.size())
           {
             trimText = gettingText; panelText += trimText.substr(swapArray[i],1);
@@ -706,7 +815,11 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX* _lgfx, LGFX_Sprite& _flickUi
         for(int j = 0; j < 3; j++){
           for(int i = 0; i < 3; i++){
             _flickUiSprite.setTextSize(1);
-            String btn_name = panelText.substr((j*3+i)*3,3).c_str();//std::string型の状態で一文字切り出して、Stringに渡す
+
+            flick_touch_btn_list[ j*3+i ]->setBtnName(panelText.substr((j*3+i)*3,3).c_str());//std::string型の状態で一文字切り出して、Stringに渡す
+            // String btn_name = flickPanels[showFlickPanelNo]->btn_name.c_str();
+            String btn_name = flick_touch_btn_list[ j*3+i ]->getBtnName();
+
             //flick_touch_btn_list[i*3+j]->btn_mode = BTN_MODE_FLICK;
             flick_touch_btn_list[j*3+i]->flickDraw( _flickUiSprite ); 
             _flickUiSprite.fillRoundRect(
@@ -725,7 +838,7 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX* _lgfx, LGFX_Sprite& _flickUi
             int b_hw = 48/2;
             int b_hh = 48/2;
             float b_str_hw = _flickUiSprite.textWidth( btn_name ) / 2;
-            _flickUiSprite.drawString( btn_name, 48*i + b_hw - b_str_hw , 48*j + b_hh - 4 );
+            _flickUiSprite.drawString( flick_touch_btn_list[ j*3+i ]->getBtnName(), 48*i + b_hw - b_str_hw , 48*j + b_hh - 4 );
           }
         }
 
@@ -1543,7 +1656,7 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
 
   setCharMode(CHAR_3_BYTE);
   //全角5文字になるように空白を入れて文字を登録
-  setFlickPanel(0, 0, "あいうえお");//第一引数はSHIFT_ID
+  setFlickPanel(0, 0, "あいうえおかきくけ");//第一引数はSHIFT_ID
   setFlickPanel(0, 1, "かきくけこ");
   setFlickPanel(0, 2, "さしすせそ");
   setFlickPanel(0, 3, "たちつてと");
@@ -1571,7 +1684,7 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
 
   setCharMode(CHAR_1_BYTE);
   //半角5文字になるように空白を入れて文字を登録
-  setFlickPanel(2, 0, "@#%&_");
+  setFlickPanel(2, 0, "@#|&_");
   setFlickPanel(2, 1, "ABC  ");
   setFlickPanel(2, 2, "DEF  ");
   setFlickPanel(2, 3, "GHI  ");
@@ -1585,7 +1698,7 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
   setFlickPanel(2, 11, ".,?! ");
 
   setFlickPanel(3, 0, "@#%&_");
-  setFlickPanel(3, 1, "abc  ");
+  setFlickPanel(3, 1, "abcdefghi");
   setFlickPanel(3, 2, "def  ");
   setFlickPanel(3, 3, "ghi  ");
   setFlickPanel(3, 4, "jkl  ");

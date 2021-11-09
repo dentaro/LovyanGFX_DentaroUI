@@ -6,7 +6,7 @@ static LGFX_Sprite output_sprite( &lcd );//テキスト用
 int btnNo = 0;
 void setup() {
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
-  ui.begin( &lcd, 24, 0, true );//lcd, 色深度,回転方向,タッチキャリブレーション
+  ui.begin( &lcd, 24, 3, true );//lcd, 色深度,回転方向,タッチキャリブレーション
   ui.createBtns( 45, 170,  150, 150, 3, 3, ui_sprite0, TOUCH );
   output_sprite.createSprite(240, 64);
 }

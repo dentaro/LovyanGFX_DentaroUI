@@ -8,7 +8,6 @@
 //TouchBtn::TouchBtn(LGFX& _lcd): lcd(_lcd) {lcd = _lcd;}
 
 
-
 void TouchBtn::initBtn(int _btnID, String _btnIDlabel, int _b_x, int _b_y, int _b_w, int _b_h, String _btn_name, 
 lgfx::v1::touch_point_t _layoutSpritePos,
 lgfx::v1::touch_point_t _uiSpritePos,
@@ -71,10 +70,10 @@ LGFX_Sprite& _g_basic_sprite)
   divSprite0.createSprite( b_qw, _layoutSprite_h );//子スプライトメモリ確保
 }
 
-void TouchBtn::setBtnName(String _btnName)
-{
-  btn_name = _btnName;
-}
+// void TouchBtn::setBtnName(String _btnName)
+// {
+//   btn_name = _btnName;
+// }
 
 void TouchBtn::setBtnNameFalse(String _btnNameFalse)
 {
@@ -396,4 +395,14 @@ int TouchBtn::get_xy_mode(){
 
 lgfx::v1::touch_point_t TouchBtn::getBtnPos(){
   return getTouchPoint(this->b_x, this->b_y);
+}
+
+
+void TouchBtn::setBtnName(String _btn_name){
+  btn_name = _btn_name;
+}
+
+String TouchBtn::getBtnName()
+{
+  return btn_name;
 }
