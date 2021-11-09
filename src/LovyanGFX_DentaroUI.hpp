@@ -14,12 +14,21 @@
 #include <stddef.h>
 
 //開発者表記
+#define CHAR_1_BYTE_5 5//=EN 5文字
+#define CHAR_1_BYTE_9 9//=EN 9文字
+#define CHAR_3_BYTE_5 15//=JP 5文字
+#define CHAR_3_BYTE_9 27//=JP 9文字
+
+
+//開発者表記
 #define CHAR_3_BYTE 0//=JP
 #define CHAR_1_BYTE 2//=EN
 #define NUMERIC 4
 //ユーザー表記(Arduino側でしか使わない)
 #define JP 0
 #define EN 2
+
+
 
 #define SHOW_NAMED 0
 #define SHOW_ALL 1
@@ -242,6 +251,8 @@ class LovyanGFX_DentaroUI {
     int shiftNum = 3;
     int charMode = CHAR_3_BYTE; //日本語
     //int charMode = CHAR_1_BYTE; //英語
+
+    int charNumMode = CHAR_3_BYTE_5;//日本語5文字
     int sec, psec;
     int fps = 0;
     int frame_count = 0;
@@ -304,7 +315,7 @@ public:
     void createFlicks( int _uiSprite_x, int _uiSprite_y, int _w,int _h, int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo);//フリック生成
     void createFlickBtns(LGFX* _lgfx, LGFX_Sprite& _flickUiSprite);
     void drawFlickBtns(LovyanGFX* _lgfx,  LGFX_Sprite& _flickUiSprite, int _btnID, bool _visible, bool _available );
-    void setFlickPanel(int _flickPanelID, int _btnID, String _btnsString, int _btn_mode);
+    // void setFlickPanel(int _flickPanelID, int _btnID, String _btnsString, int _btn_mode);
     void setFlickPanel(int _flickPanelID, int _btnID, String _btnsString);
     void drawFlicks(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
     void drawFlicks( int uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);

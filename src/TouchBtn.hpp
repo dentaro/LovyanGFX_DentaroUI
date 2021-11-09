@@ -185,7 +185,7 @@ public:
     int _visible_mode );
     
     void initTile(int _btnID,String _btn_name, lgfx::v1::touch_point_t _layoutSpritePos, int layoutSprite_w, int layoutSprite_h, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _g_basic_sprite);
-    void setBtnName(String _btnName);
+    // void setBtnName(String _btnName);
     void setBtnNameFalse(String _btnNameFalse);
     void btnDraw(LGFX_Sprite& _sprite);
     void flickDraw(LGFX_Sprite& _sprite);
@@ -203,6 +203,9 @@ public:
     void setBgColorIndex(uint16_t _bgColorIndex);
     int getBtnID();
     int getBtnMode();
+
+    void setBtnName(String _btn_name);
+    String getBtnName();
     
     void setPngTile(fs::FS &fs, String _m_url, LGFX_Sprite& _g_basic_sprite);
     lgfx::v1::touch_point_t getTouchPoint(int _x, int _y);
