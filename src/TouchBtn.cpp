@@ -254,12 +254,12 @@ void TouchBtn::delHandlers2(){
       }
 }
 
-void TouchBtn::run2(int _btnID, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo)
+void TouchBtn::run2(int _btnID, int _btnNo, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo)
 {
-  run2(_btnID, _sp.x, _sp.y, _tp.x, _tp.y, _eventState, _runEventNo);
+  run2(_btnID, _btnNo, _sp.x, _sp.y, _tp.x, _tp.y, _eventState, _runEventNo);
 }
 
-void TouchBtn::run2(int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo){
+void TouchBtn::run2(int _btnID, int _btnNo, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo){
       sp.x = _sx;
       sp.y = _sy;
       tp.x = _tx;

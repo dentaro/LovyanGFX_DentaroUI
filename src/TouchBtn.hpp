@@ -197,8 +197,8 @@ public:
     bool getVisibleF();
     void addHandler(DelegateBase2* _func);
     void delHandlers2();
-    void run2( int _btnID, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo);
-    void run2( int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo);
+    void run2( int _btnID, int _btnNo, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo);
+    void run2( int _btnID, int _btnNo, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo);
     void setColor(uint16_t _color);
     void setBgColorIndex(uint16_t _bgColorIndex);
     int getBtnID();
