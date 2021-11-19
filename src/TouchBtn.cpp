@@ -7,6 +7,11 @@
 
 //TouchBtn::TouchBtn(LGFX& _lcd): lcd(_lcd) {lcd = _lcd;}
 
+void TouchBtn::setlayoutSpritePos(lgfx::v1::touch_point_t _layoutSpritePos)
+{
+  layoutSpritePos = _layoutSpritePos;
+}
+
 
 void TouchBtn::initBtn(int _btnID, String _btnIDlabel, int _b_x, int _b_y, int _b_w, int _b_h, String _btn_name, 
 lgfx::v1::touch_point_t _layoutSpritePos,
@@ -99,7 +104,7 @@ void TouchBtn::btnDraw(LGFX_Sprite& _uiSprite)
       drawName = btn_nameFalse;
       }
     b_str_hw = _uiSprite.textWidth(drawName)/2;
-    _uiSprite.drawString(drawName, b_x + b_hw - b_str_hw , b_y + b_hh - 4);
+    _uiSprite.drawString(drawName, b_x + b_hw - b_str_hw , b_y + b_hh - 8);
   }
   else if(this->btn_mode == TOUCH_BTN_MODE)//普通のボタンの時
   {
@@ -109,7 +114,7 @@ void TouchBtn::btnDraw(LGFX_Sprite& _uiSprite)
       //_uiSprite.setFont(&lgfxJapanGothicP_20);
       // drawName = btn_name;
       b_str_hw = _uiSprite.textWidth(btn_name)/2;
-      _uiSprite.drawString(btn_name, b_x + b_hw - b_str_hw , b_y + b_hh - 4);
+      _uiSprite.drawString(btn_name, b_x + b_hw - b_str_hw , b_y + b_hh - 8);
     }
   }
   else if( this->btn_mode == TOUCH_FLICK_MODE )//フリックボタンの時
@@ -121,7 +126,7 @@ void TouchBtn::btnDraw(LGFX_Sprite& _uiSprite)
       //_uiSprite.setFont(&lgfxJapanGothicP_20);
       // drawName = btnIDlabel;//btn_name;
       b_str_hw = _uiSprite.textWidth( btn_name ) / 2;
-      _uiSprite.drawString( btn_name, b_x + b_hw - b_str_hw , b_y + b_hh - 4 );
+      _uiSprite.drawString( btn_name, b_x + b_hw - b_str_hw , b_y + b_hh - 8 );
     }
   }
 
@@ -254,12 +259,12 @@ void TouchBtn::delHandlers2(){
       }
 }
 
-void TouchBtn::run2(int _btnID, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo)
+void TouchBtn::run2(int _btnID, int _btnNo, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo)
 {
-  run2(_btnID, _sp.x, _sp.y, _tp.x, _tp.y, _eventState, _runEventNo);
+  run2(_btnID, _btnNo, _sp.x, _sp.y, _tp.x, _tp.y, _eventState, _runEventNo);
 }
 
-void TouchBtn::run2(int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo){
+void TouchBtn::run2(int _btnID, int _btnNo, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo){
       sp.x = _sx;
       sp.y = _sy;
       tp.x = _tx;

@@ -177,6 +177,8 @@ public:
     lgfx::v1::touch_point_t _spritePos,
     LGFX_Sprite& _sprite,
     int _btn_mode);
+
+    void setlayoutSpritePos(lgfx::v1::touch_point_t _layoutSpritePos);
     
     void initSlider(int _btnID, int _s_x, int _s_y, int _s_w, int _s_h, String _btn_name, 
     lgfx::v1::touch_point_t _layoutSpritePos,
@@ -197,8 +199,8 @@ public:
     bool getVisibleF();
     void addHandler(DelegateBase2* _func);
     void delHandlers2();
-    void run2( int _btnID, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo);
-    void run2( int _btnID, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo);
+    void run2( int _btnID, int _btnNo, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo);
+    void run2( int _btnID, int _btnNo, int _sx, int _sy, int _tx, int _ty, int _eventState, int _runEventNo);
     void setColor(uint16_t _color);
     void setBgColorIndex(uint16_t _bgColorIndex);
     int getBtnID();

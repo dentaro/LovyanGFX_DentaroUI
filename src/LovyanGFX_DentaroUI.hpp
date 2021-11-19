@@ -54,10 +54,12 @@
 class RetClass {
 public:
   int btnID = -1;
+  int btnNo = -1;
   lgfx::v1::touch_point_t sp;
   
   void reset(){
     btnID = -1;
+    btnNo = -1;
     sp.x = 0;
     sp.y = 0;
   }
@@ -65,6 +67,11 @@ public:
   int ret0(int _btnID){
     btnID = _btnID;
     return btnID;
+  }
+
+  int ret1(int _btnNo){
+    btnNo = _btnNo;
+    return btnNo;
   }
   
   void func01(int _btnID, int _x, int _y, int _eventState, int _runEventNo) {   // 関数プロトタイプ「void xxx(int,int,int,int);」
@@ -272,6 +279,13 @@ class LovyanGFX_DentaroUI {
     int curKanaColNo = 0;
     bool touchCalibrationF = false;
 
+    int TopBtnUiID = 0;
+    int LeftBtnUiID = 0;
+    int RightBtnUiID = 0;
+    int FlickUiID = 0;
+
+    bool uiOpenF = true;
+
 public:
     // LovyanGFX_DentaroUI( LGFX& _lcd ): lcd(_lcd) {};
     LovyanGFX_DentaroUI( LGFX* _lcd ): lcd(_lcd) {};
@@ -289,7 +303,7 @@ public:
     void begin(LGFX* _lcd, LGFX_Sprite& _flickUiSprite, int _shiftNum);
     void touchCalibration (bool _calibUseF);
     bool isAvailable(int _btnID);
-    void addHandler(int _btnID, DelegateBase2* _func, uint16_t _runEventNo, int parentID = 0);
+    void addHandler(int _btnID, int _btnNo, DelegateBase2* _func, uint16_t _runEventNo, int parentID = 0);
     void circle(LovyanGFX* _lgfx, uint16_t c, int fillF);
     void rect(LovyanGFX* _lgfx, uint16_t c, int fillF);
     float getAngle(lgfx::v1::touch_point_t a, lgfx::v1::touch_point_t b );
@@ -302,8 +316,16 @@ public:
     void setPos(int _x, int _y);
     void setStartPos(int _x, int _y);
     DelegateBase2 *ret0_DG = Delegate2<RetClass>::createDelegator2( &obj_ret, &RetClass::ret0 );//型式が違うプロトタイプ関数
+
+    DelegateBase2 *ret1_DG = Delegate2<RetClass>::createDelegator2( &obj_ret, &RetClass::ret1 );//型式が違うプロトタイプ関数
+
+    void setLayoutPos( int _x, int _y );
+
     void createLayout( int _layoutSprite_x, int _layoutSprite_y, int _layoutSprite_w, int _layoutSprite_h, LGFX_Sprite& _layoutSprite, int _eventNo);
     void setLayoutSpritePos( int _LayoutSpritePosx, int _LayoutSpritePosy );
+    
+    void setLayoutPosToAllBtn( lgfx::v1::touch_point_t  _layoutPos );
+
     void setBtnName(int _btnNo, String _btnName);
     void setBtnName(int _btnNo, String _btnName, String _btnNameFalse);//toggle用
     void setQWERTY(int _uiID, String _btnsString, LGFX_Sprite& _sprite);
@@ -314,9 +336,9 @@ public:
     void createTile( LGFX_Sprite& _layoutSprite, int _layoutUiID, int _eventNo);
     void createFlicks( int _uiSprite_x, int _uiSprite_y, int _w,int _h, int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo);//フリック生成
     void createFlickBtns(LGFX* _lgfx, LGFX_Sprite& _flickUiSprite);
-    void drawFlickBtns(LovyanGFX* _lgfx,  LGFX_Sprite& _flickUiSprite, int _btnID, bool _visible, bool _available );
+    void drawFlickBtns( LovyanGFX* _lgfx,  LGFX_Sprite& _flickUiSprite, int _btnID, int _btnNo, bool _visible, bool _available );
     // void setFlickPanel(int _flickPanelID, int _btnID, String _btnsString, int _btn_mode);
-    void setFlickPanel(int _flickPanelID, int _btnID, String _btnsString);
+    void setFlickPanel( int _flickPanelID, int _btnID, String _btnsString );
     void drawFlicks(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
     void drawFlicks( int uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
     void drawBtns(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
@@ -331,7 +353,8 @@ public:
     void setPngTile(fs::FS &fs, String _m_url);
     void setTilePos(int _id, int _x, int _y);
     LGFX_Sprite getTileSprite(int _btnID);
-    int getTouchBtnID();//タッチされたボタンオブジェクトの番号を取得
+    int getTouchBtnNo();//タッチされたボタンオブジェクトの番号を取得
+    int getTouchBtnID();//タッチされたボタンオブジェクトのIDを取得
     int getEvent();
     int getFlickEvent();
     void showTouchEventInfo(LovyanGFX* _lgfx, int _x, int _y);
@@ -369,14 +392,17 @@ public:
     void setUiLabels(int uiID, int _showFlickPanelNo);
     lgfx::v1::touch_point_t getBtnPos(int _btnID);
 
-    void showInfo(LGFX& _lgfx );
-    void showInfo( LovyanGFX* _lgfx );
+    //void showInfo(LGFX& _lgfx );
+    void showInfo(LGFX& _lgfx , int _infox, int _infoy);
+    // void showInfo( LovyanGFX* _lgfx );
+    void showInfo( LovyanGFX* _lgfx, int _infox, int _infoy);
 
     String getHenkanChar(int _henkanListNo, int _kanaShiftNo);
     void setFlickPanels();//キーボード用プリセット
-    void setFlick();//キーボード用プリセッ；
-    void setFlick(int _charMode);
-    void flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _ui_sprite0, LGFX_Sprite& ui_sprite1, LGFX_Sprite& ui_sprite2, LGFX_Sprite& _flickUiSprite );
+    void setFlick( int _TopBtnUiID, int _FlickUiID, int _LeftBtnUiID, int _RightBtnUiID);//キーボード用プリセッ；
+    void setFlick( int _charMode, int _TopBtnUiID, int _FlickUiID, int _LeftBtnUiID, int _RightBtnUiID );
+    void flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, 
+                      LGFX_Sprite& _ui_sprite0, LGFX_Sprite& _ui_sprite1, LGFX_Sprite& _ui_sprite2, LGFX_Sprite& _ui_sprite3, LGFX_Sprite& _flickUiSprite);
     String getInvisibleFlickStrings();
     String getFlickString();
     String getFlickString(bool _visibleMode);
