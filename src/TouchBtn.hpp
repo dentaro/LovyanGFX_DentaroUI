@@ -5,10 +5,10 @@
 #include <LovyanGFX.hpp>
 
 //M5stackなどの製品で使用するときはAUTODETECTを使って下さい。
-#include <LGFX_AUTODETECT.hpp>
+//#include <LGFX_AUTODETECT.hpp>
 
 //自作基板などで、AUTODETECTの代わりにカスタム設定を使いたいときはこちらを編集して下さい。
-// #include "LGFX_ESP32_custom.hpp"
+  #include "LGFX_ESP32_custom_320_240.hpp"
 
 #include <list>
 
@@ -169,6 +169,8 @@ class TouchBtn {
     float sliderValx = 0.5;
     float sliderValy = 0.5;
 
+    bool drawFinishF = false;
+
 public:
     TouchBtn(LGFX* _lcd): lcd(_lcd) {}
     LGFX* lcd;
@@ -224,5 +226,8 @@ public:
     // lgfx::v1::touch_point_t  getTilePos();
     void setTilePos(lgfx::v1::touch_point_t _pos);
     int get_xy_mode();
+
+    void setDrawFinishF(bool _drawFinishF);
+    bool getDrawFinishF();
 
 };

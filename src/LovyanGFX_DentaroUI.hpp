@@ -1,6 +1,8 @@
 #pragma once //インクルードガード
 
+// #include "SD.h"
 #include "LovyanGFX_DentaroUI.hpp"
+
 #include "TouchBtn.hpp"
 #include <deque>
 
@@ -50,6 +52,8 @@
 
 #define VISIBLE true
 #define INVISIBLE false
+
+#define BUF_PNG_NUM 9
 
 class RetClass {
 public:
@@ -144,6 +148,106 @@ class FlickPanel
   int b_No = -1;
   std::deque<String> text_list; //パネルテキスト配置用デック配列
   FlickPanel(){};
+};
+
+class MapTile
+{
+  // private:
+  public:
+  int  posId = -1;
+  int  posNo = -1;
+  bool readF = false;
+  int  mapName = -1;
+  int  mapNo = -1;
+  int  preMapNo = 0;
+  int objNo = -1;
+  int MapNo = 0;
+  int latPos, lonPos = 0;
+  bool existF = false;
+  // int xtile, ytile, ztile = 0;
+  int xtilePos, ytilePos = 0;
+  int xtileNo, ytileNo, ztileNo = 0;//IDで使う
+  int preXtileNo, preYtileNo, preZtileNo = 0;//
+  int addXTileNo, addYTileNo = 0;//中央からの相対的なタイルナンバー -1,1
+  int preAddXTileNo, preAddYTileNo = 0;//中央からの相対的なタイルナンバー -1,1
+  String m_url;
+  LGFX_Sprite buff_sprite;
+  LGFX_Sprite* buff_sprite_p;
+  MapTile(){};
+
+  void begin(int _objNo, int _xtile, int _ytile,int _ztile, String _m_url){
+    // xtile = _xtile;
+    // ytile = _ytile;
+    // ztile = _ztile;
+    objNo = _objNo;
+
+    m_url = _m_url;
+    
+    buff_sprite.setPsram(USE_PSRAM);
+    buff_sprite.setColorDepth(TILE_COL_DEPTH);//子スプライトの色深度
+    buff_sprite.createSprite(256, 256);//子スプライトメモリ確保
+    buff_sprite.setPaletteGrayscale();
+    buff_sprite.drawPngFile(SD, m_url,
+                            0, 0,
+                            256, 256,
+                            0, 0, 1.0, 1.0,
+                            datum_t::top_left);
+    buff_sprite_p = &buff_sprite;//オブジェクトのアドレスをコピーして、ポインタを格納
+
+  }
+
+  LGFX_Sprite* getSpritePtr(){return buff_sprite_p;}
+  int getObjNo(){return objNo;}
+  // void setXtile(int _xtile){xtile = _xtile;}
+  // void setYtile(int _ytile){ytile = _ytile;}
+  // int getXtile(){return xtile;}
+  // int getYtile(){return ytile;}
+  void setPreXtileNo(int _preXtileNo){preXtileNo = _preXtileNo;}
+  void setPreYtileNo(int _preYtileNo){preYtileNo = _preYtileNo;}
+  void setXtileNo(int _xtileNo){xtileNo = _xtileNo;}
+  void setYtileNo(int _ytileNo){ytileNo = _ytileNo;}
+
+  void setXtilePos(int _xtilePos){xtilePos = _xtilePos;}
+  void setYtilePos(int _ytilePos){ytilePos = _ytilePos;}
+
+  int getXtileNo(){return xtileNo;}
+  int getYtileNo(){return ytileNo;}
+  
+  int getPreXtileNo(){return preXtileNo;}
+  int getPreYtileNo(){return preYtileNo;}
+
+  int getXtilePos(){return xtilePos;}
+  int getYtilePos(){return ytilePos;}
+
+  void setAddX( int _addXTileNo){addXTileNo = _addXTileNo;}
+  void setAddY(int _addYTileNo){addYTileNo = _addYTileNo;}
+  int getAddX(){return addXTileNo;}
+  int getAddY(){return addYTileNo;}
+
+  void setPreAddX( int _preAddXTileNo){preAddXTileNo = _preAddXTileNo;}
+  void setPreAddY(int _preAddYTileNo){preAddYTileNo = _preAddYTileNo;}
+  int getPreAddX(){return preAddXTileNo;}
+  int getPreAddY(){return preAddYTileNo;}
+
+  void setMapReadF( bool _readF){readF = _readF;}
+  bool getMapReadF(){return readF;};
+  // void setMapName( int _mapName){mapName = _mapName;}
+  
+  int getMapName(){return mapName;}
+  void setMapNo(int _mapNo){mapNo = _mapNo;}
+  int getMapNo(){return mapNo;}
+
+  void setPreMapNo(int _preMapNo){preMapNo = _preMapNo;}
+  int getPreMapNo(){return preMapNo;}
+
+
+  void setPosNo(int _posNo){posNo = _posNo;}
+  int getPosNo(){return posNo;}
+
+  void setExistF(bool _existF){existF = _existF;}
+  bool getExistF(){return existF;}
+  
+
 };
 
 class LovyanGFX_DentaroUI {
@@ -247,12 +351,16 @@ class LovyanGFX_DentaroUI {
     int preEventState = -1;
     int AngleCount = 0;
     int uiBoxes_num = 0;
+    // std::deque<UiContainer> uiBoxes;
     std::deque<UiContainer> uiBoxes;
+    // UiContainer uiBoxes[18];
     UiContainer flickPanel;
     int layoutSprite_w = 0;
     int layoutSprite_h = 0;
     bool toggle_mode = false;
-    LGFX_Sprite g_basic_sprite;
+    // LGFX_Sprite g_basic_sprite;
+    //LGFX_Sprite g_basic_sprite_list[9];
+    MapTile* MapTiles[9];
     String m_url = "";
     RetClass obj_ret;
     int shiftNum = 3;
@@ -286,26 +394,101 @@ class LovyanGFX_DentaroUI {
 
     bool uiOpenF = true;
 
+
+    bool DownloadF = false;
+    bool mataidaF =false;
+    // double latPos = 35.667995;
+    // double lonPos = 139.7532971887966;//139.642076;
+    // int tileZoom = 15;//8; //座標計算用
+
+    int xtile = 0;
+    int ytile = 0;
+    int ztile = 0;
+    int xtileNo = 0;
+    int ytileNo = 0;
+
+    int dirID = 0;
+
+    int preXtileNo = 0;
+    int preYtileNo = 0;
+    int preXtile = 0;
+    int preYtile = 0;
+
+    int preDirID = 0;
+
+    float vx = 0;
+    float vy = 0;
+    String host = "";
+
+    
+
+    //dirID
+    //|6|7|8|
+    //|5|0|1|
+    //|4|3|2|
+    // int mapNolist[9][2];
+    // int tilePositons[9][4];
+    int mapNoArray[9]= {-1,-1,-1,-1,-1,-1,-1,-1,-1};
+
+    float matrix[6];
+    float matrix_list[9][6] = {
+      {1.0, 0.0, 0,  0.0, 1.0, 0},
+      {1.0, 0.0, 0,  0.0, 1.0, 0},
+      {1.0, 0.0, 0,  0.0, 1.0, 0},
+      {1.0, 0.0, 0,  0.0, 1.0, 0},
+      {1.0, 0.0, 0,  0.0, 1.0, 0},
+      {1.0, 0.0, 0,  0.0, 1.0, 0},
+      {1.0, 0.0, 0,  0.0, 1.0, 0},
+      {1.0, 0.0, 0,  0.0, 1.0, 0},
+      {1.0, 0.0, 0,  0.0, 1.0, 0}
+    };
+
+    //        //dirID
+    //        //|6|7|8|
+    //        //|5|0|1|
+    //        //|4|3|2|
+    int addTPosList[9][2] = {
+      { 0, 0},{ 1, 0},{ 0, 1},
+      { -1,0},{ 0,-1},{ 1,-1},
+      {1, 1},{-1,1},{ -1,-1}
+    };
+    
+    //int altIdList[9] = {4,5,7,3,1,2,8,6,0};
+
+    //bool existStateF[9] = {true,true,true,true,true,true,true,true,true};
+    //bool existStateF[9] = {false,false,false,false,false,false,false,false,false};
+
+    int gPosId = -1;
+
+    //std::list<int> preReadXtileNo ={};
+    //std::list<int> preReadYtileNo ={};
+    int preReadXtileNo[9];
+    int preReadYtileNo[9];
+
+    bool allpushF = false;
+    int ecnt = 0;
+    
+    String ROI_m_url ="";
+
 public:
+    LGFX_Sprite layoutSprite_list[BUF_PNG_NUM];
     // LovyanGFX_DentaroUI( LGFX& _lcd ): lcd(_lcd) {};
     LovyanGFX_DentaroUI( LGFX* _lcd ): lcd(_lcd) {};
     LGFX* lcd;
     LovyanGFX* lgfx;
     LGFX_Sprite flickUiSprite;//フリック展開パネル用
     void update( LGFX* _lcd );
-    
-    void begin( LGFX* _lcd, int _colBit, int _rotateNo, bool _calibF );
-    void begin( LGFX* _lcd, LGFX_Sprite& _flickUiSprite, int _SHIFT_NUM, int _colBit, int _rotateNo, bool _calibF );
-
-    void begin( LGFX* _lcd, bool _calibF );
+    void setLatLonPos(double lat, double lon);
+    // void getTilePos(int zoom_level, int* xtile, int* ytile, int* ztile);
+    void getTilePos(double lat, double lon, int zoom_level);
+    void begin( LGFX* _lcd, String _host, int _shiftNum, int _colBit, int _rotateNo, bool _calibF );
     void begin(LGFX* _lcd);
-    void begin( LGFX* _lcd , LGFX_Sprite& _flickUiSprite, int _shiftNum, bool _calibF );
-    void begin(LGFX* _lcd, LGFX_Sprite& _flickUiSprite, int _shiftNum);
     void touchCalibration (bool _calibUseF);
     bool isAvailable(int _btnID);
     void addHandler(int _btnID, int _btnNo, DelegateBase2* _func, uint16_t _runEventNo, int parentID = 0);
     void circle(LovyanGFX* _lgfx, uint16_t c, int fillF);
     void rect(LovyanGFX* _lgfx, uint16_t c, int fillF);
+    void nowLoc(LovyanGFX* _lgfx);
     float getAngle(lgfx::v1::touch_point_t a, lgfx::v1::touch_point_t b );
     float getDist(lgfx::v1::touch_point_t a, lgfx::v1::touch_point_t b );
     int getPreEvent();
@@ -333,7 +516,7 @@ public:
     void createBtns( int _uiSprite_x, int _uiSprite_y, int _w,int _h,int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo, bool _colF);//横方向に並ぶ
     void createToggles( int _uiSprite_x, int _uiSprite_y, int _w,int _h, int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo);//縦方向に並ぶ
     void createSliders( int _x, int _y, int _w, int _h,  int _row, int _col, LGFX_Sprite& _uiSprite, int _visible_mode, int _eventNo);
-    void createTile( LGFX_Sprite& _layoutSprite, int _layoutUiID, int _eventNo);
+    void createTile( LGFX_Sprite& _layoutSprite, int _layoutUiID, int _eventNo, int _spriteNo);
     void createFlicks( int _uiSprite_x, int _uiSprite_y, int _w,int _h, int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo);//フリック生成
     void createFlickBtns(LGFX* _lgfx, LGFX_Sprite& _flickUiSprite);
     void drawFlickBtns( LovyanGFX* _lgfx,  LGFX_Sprite& _flickUiSprite, int _btnID, int _btnNo, bool _visible, bool _available );
@@ -347,12 +530,14 @@ public:
     void drawToggles(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
     void drawSliders(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
     void drawSliders(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
-    void drawTile(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, uint8_t _bgColIndex);
+    void drawTile(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, uint8_t _bgColIndex, int _spriteNo);
+    void drawTileAuto(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, uint8_t _bgColIndex, int _spriteNo);
+
     void drawLayOut(LGFX_Sprite& _layoutSprite);
     void drawSelectBtn(int _id);
-    void setPngTile(fs::FS &fs, String _m_url);
+    void setPngTile(fs::FS &fs, String _m_url, int _spriteNo);
     void setTilePos(int _id, int _x, int _y);
-    LGFX_Sprite getTileSprite(int _btnID);
+    // LGFX_Sprite getTileSprite(int _btnID);
     int getTouchBtnNo();//タッチされたボタンオブジェクトの番号を取得
     int getTouchBtnID();//タッチされたボタンオブジェクトのIDを取得
     int getEvent();
@@ -401,6 +586,8 @@ public:
     void setFlickPanels();//キーボード用プリセット
     void setFlick( int _TopBtnUiID, int _FlickUiID, int _LeftBtnUiID, int _RightBtnUiID);//キーボード用プリセッ；
     void setFlick( int _charMode, int _TopBtnUiID, int _FlickUiID, int _LeftBtnUiID, int _RightBtnUiID );
+    void flickSetup( LGFX* _lcd, LGFX_Sprite& _layoutSprite, 
+                      LGFX_Sprite& _ui_sprite0, LGFX_Sprite& _ui_sprite1, LGFX_Sprite& _ui_sprite2, LGFX_Sprite& _ui_sprite3, LGFX_Sprite& _flickUiSprite);
     void flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite, 
                       LGFX_Sprite& _ui_sprite0, LGFX_Sprite& _ui_sprite1, LGFX_Sprite& _ui_sprite2, LGFX_Sprite& _ui_sprite3, LGFX_Sprite& _flickUiSprite);
     String getInvisibleFlickStrings();
@@ -418,6 +605,101 @@ public:
     String delEndChar(String _str, int _ByteNum);
 
     void delChar();
+
+    String getPngUrl(int addNo);
+    int getXtile();
+    int getYtile();
+    int getZtile();
+    int getXtileNo();
+    int getYtileNo();
+
+    int getXtileNo(int _objNo);
+    int getYtileNo(int _objNo);
+
+    int getPreXtileNo();
+    int getPreYtileNo();
+    int getPreXtile();
+    int getPreYtile();
+
+    int getVx();
+    int getVy();
+
+    int getDirID();
+    int getPreDirID();
+    void setPreDirID(int _dirID);
+
+    void setMapNolist(int _spriteNo, int _xTileNo, int _yTileNo);
+    bool existMapNolist(int _spriteNo, int _xTileNo, int _yTileNo);
+
+    bool getDrawMapF(int __posId);
+
+    // void setTilePosition(int _spriteNo, int _xtile, int _ytile, int _addXTileNo, int _addYTileNo);
+    // void setTilePositions(int _spriteNo, int _X_1, int _Y_1);
+
+    int getAddX(int _spriteNo);
+    int getAddY(int _spriteNo);
+    void setAddX(int _objId,  int _xtileNo);
+    void setAddY(int _objId,  int _ytileNo);
+
+    int getPreAddX(int _spriteNo);
+    int getPreAddY(int _spriteNo);
+    void setPreAddX(int _objId,  int _xtileNo);
+    void setPreAddY(int _objId,  int _ytileNo);
+
+    int getPositionNo(int _addXTileNo, int _addYTileNo);
+
+    void setXtileNo(int _objId,  int _xtileNo);
+    void setYtileNo(int _objId,  int _ytileNo);
+    void setTileNo(int _objId, int _xtileNo, int _ytileNo);
+
+    void setPreYtileNo(int _objId,  int _preYtileNo);
+    void setPreXtileNo(int _objId,  int _preXtileNo);
+
+    void setXtilePos(int _objId,  int _xtilePos);
+    void setYtilePos(int _objId,  int _ytilePos);
+    int getXtilePos(int _objId);
+    int getYtilePos(int _objId);
+
+    void setMapReadF(int _objId,  bool _mapReadF);
+    void setMapPosNo(int _objId, int _posNo);
+    int getMapPosNo(int _objId);
+
+    int getPreXtileNo(int _objNo);
+    int getPreYtileNo(int _objNo);
+
+    // int getMapNo(int _objId);
+    void setMapNoArray(int _mapI, int _mapNo);
+
+    void setMapNo(int _objId, int _mapNo);
+    int getMapNo(int _objId);
+
+    void setPreMapNo(int _objId, int _PreMapNo);
+    int getPreMapNo(int _objId);
+
+    int getNowMapNo(int _addX, int _addY);
+
+    void setExistF(int _objId, bool _existF);
+    bool getExistF(int _objId);
+
+    void setDrawFinishF(int _objId, bool _drawFinishF);
+    bool getDrawFinishF(int _objId);
+
+    
+    void setDownloadF(bool _b);
+    bool getDownloadF();
+
+    int get_gPosId();
+    void set_gPosId(int _gPosId);
+
+    void setupMaps(LGFX* _lcd);
+    void drawMaps(LGFX* _lcd, double _walkLatPos, double _walkLonPos, int _tileZoom);
+    void task2_setPngTile(int _posId);
+
+    // void drawMaps();
+
+    // LGFX_Sprite&  getLayoutSprite(int _no);
+    // void setDownloadF(bool _b);
+    // bool getDownloadF();
 
 //  getTouchingDist();//タッチしている距離を取得
 //  getTouchingTime();//タッチしている時間を取得

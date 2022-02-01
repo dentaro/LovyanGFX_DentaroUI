@@ -12,7 +12,6 @@ void TouchBtn::setlayoutSpritePos(lgfx::v1::touch_point_t _layoutSpritePos)
   layoutSpritePos = _layoutSpritePos;
 }
 
-
 void TouchBtn::initBtn(int _btnID, String _btnIDlabel, int _b_x, int _b_y, int _b_w, int _b_h, String _btn_name, 
 lgfx::v1::touch_point_t _layoutSpritePos,
 lgfx::v1::touch_point_t _uiSpritePos,
@@ -72,13 +71,10 @@ LGFX_Sprite& _g_basic_sprite)
 //  b_qh = h/4;
   btn_name = _btn_name;
   divSprite0.setPsram( false );//DMA利用のためPSRAMは切る
+  // divSprite0.setPsram( true );
+  divSprite0.setColorDepth(COL_DEPTH);
   divSprite0.createSprite( b_qw, _layoutSprite_h );//子スプライトメモリ確保
 }
-
-// void TouchBtn::setBtnName(String _btnName)
-// {
-//   btn_name = _btnName;
-// }
 
 void TouchBtn::setBtnNameFalse(String _btnNameFalse)
 {
@@ -196,12 +192,19 @@ void TouchBtn::setSelectBtnF(bool _selectBtnF){
   selectBtnF = _selectBtnF;
 }
 
-void TouchBtn::tileDraw(LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, lgfx::v1::touch_point_t _layoutSpritePos, lgfx::v1::touch_point_t _sp, uint8_t _bgColIndex, LGFX_Sprite& _g_basic_sprite)
+void TouchBtn::tileDraw(LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, 
+lgfx::v1::touch_point_t _layoutSpritePos, lgfx::v1::touch_point_t _sp, 
+uint8_t _bgColIndex, LGFX_Sprite& _g_basic_sprite)
 {
+
+  // Serial.println("aliveccc");
 
   _layoutSprite.setColorDepth(TILE_COL_DEPTH);//親スプライト16
   //_layoutSprite.fillScreen(_bgColIndex);
   divSprite0.setColorDepth(TILE_COL_DEPTH);//親スプライト16
+
+  // _layoutSprite.setColorDepth(TILE_COL_DEPTH);//親スプライト16
+  // divSprite0.setColorDepth(TILE_COL_DEPTH);//親スプライト16
   
   _g_basic_sprite.setPivot(_g_basic_sprite.width()/2.0, _g_basic_sprite.height()/2.0);//setPivot()で回転する場合の原点を指定します。初期値は左上の(0, 0)だと思います
 
@@ -224,6 +227,8 @@ void TouchBtn::tileDraw(LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, lgfx::v1::
 
   _g_basic_sprite.pushSprite(&divSprite0, tilePos.x-b_qw*3, tilePos.y);
   divSprite0.pushSprite(&_layoutSprite, b_qw*3, 0);//親を指定して出力
+
+  drawFinishF = true;
 }
 
 void TouchBtn::setAvailableF(bool _availableF){
@@ -410,4 +415,12 @@ void TouchBtn::setBtnName(String _btn_name){
 String TouchBtn::getBtnName()
 {
   return btn_name;
+}
+
+void TouchBtn::setDrawFinishF(bool _drawFinishF){
+  drawFinishF = _drawFinishF;
+}
+
+bool TouchBtn::getDrawFinishF(){
+  return drawFinishF;
 }
