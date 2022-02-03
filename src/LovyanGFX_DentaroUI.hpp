@@ -531,7 +531,7 @@ public:
     void drawSliders(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
     void drawSliders(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _uiSprite);
     void drawTile(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, uint8_t _bgColIndex, int _spriteNo);
-    void drawTileAuto(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, uint8_t _bgColIndex, int _spriteNo);
+    void drawTileAuto(int _uiID, LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, int _bgColIndex, int _spriteNo);
 
     void drawLayOut(LGFX_Sprite& _layoutSprite);
     void drawSelectBtn(int _id);
@@ -676,7 +676,7 @@ public:
     void setPreMapNo(int _objId, int _PreMapNo);
     int getPreMapNo(int _objId);
 
-    int getNowMapNo(int _addX, int _addY);
+    // int getNowMapNo(int _addX, int _addY);
 
     void setExistF(int _objId, bool _existF);
     bool getExistF(int _objId);

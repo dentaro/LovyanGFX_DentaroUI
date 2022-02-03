@@ -1536,7 +1536,7 @@ void LovyanGFX_DentaroUI::drawTile(int uiID, LovyanGFX* _lgfx, LGFX_Sprite& _lay
 
   }
 }
-void LovyanGFX_DentaroUI::drawTileAuto(int uiID, LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, uint8_t _bgColIndex, int _spriteNo )//スプライトに格納
+void LovyanGFX_DentaroUI::drawTileAuto(int uiID, LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, int _bgColIndex, int _spriteNo )//スプライトに格納
 {
   int _id = uiBoxes[uiID].b_sNo;
   // touch_btn_list[_id]->setVisibleF(false);
@@ -2418,13 +2418,13 @@ void LovyanGFX_DentaroUI::set_gPosId(int _gPosId)
   gPosId = _gPosId;
 }
 
-int LovyanGFX_DentaroUI::getNowMapNo(int _addX, int _addY){
-  // for(int i = 0; i < BUF_PNG_NUM; i++){
-  //   if(addTPosList[i][0] == _addX && addTPosList[i][1] == _addY){
-  //     return i;
-  //   }
-  // }
-}
+// int LovyanGFX_DentaroUI::getNowMapNo(int _addX, int _addY){
+//   // for(int i = 0; i < BUF_PNG_NUM; i++){
+//   //   if(addTPosList[i][0] == _addX && addTPosList[i][1] == _addY){
+//   //     return i;
+//   //   }
+//   // }
+// }
 
 void LovyanGFX_DentaroUI::drawMaps(LGFX* _lcd, double _walkLatPos, double _walkLonPos, int _tileZoom){
 
