@@ -14,13 +14,15 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <vector> 
+
+
 
 //開発者表記
 #define CHAR_1_BYTE_5 5//=EN 5文字
 #define CHAR_1_BYTE_9 9//=EN 9文字
 #define CHAR_3_BYTE_5 15//=JP 5文字
 #define CHAR_3_BYTE_9 27//=JP 9文字
-
 
 //開発者表記
 #define CHAR_3_BYTE 0//=JP
@@ -29,8 +31,6 @@
 //ユーザー表記(Arduino側でしか使わない)
 #define JP 0
 #define EN 2
-
-
 
 #define SHOW_NAMED 0
 #define SHOW_ALL 1

@@ -1,17 +1,22 @@
 #pragma once //インクルードガード
 
+using namespace std;
+#define SDCARD_SS_PIN 4 //M5toughのSD_CSは4
+#define SDCARD_SPI SPI
+
 #include "SD.h"
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
 
+
+
 //M5stackなどの製品で使用するときはAUTODETECTを使って下さい。
-//#include <LGFX_AUTODETECT.hpp>
+#include <LGFX_AUTODETECT.hpp>
 
 //自作基板などで、AUTODETECTの代わりにカスタム設定を使いたいときはこちらを編集して下さい。
-  #include "LGFX_ESP32_custom_320_240.hpp"
+//#include "LGFX_ESP32_custom_320_240.hpp"
 
 #include <list>
-
 
 #define USE_PSRAM true
 

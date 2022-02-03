@@ -9,7 +9,7 @@ enum
 };
 
 // ボタン状態のビット列を保持する型（ボタン数を９個以上に増やす場合は必要に応じてuint16_tやuint32_tに変更する）
-typedef std::uint8_t bits_btn_t;
+typedef uint8_t bits_btn_t;
 
 enum : bits_btn_t
 { bit_btn_a = 1<<btn_a
@@ -19,12 +19,12 @@ enum : bits_btn_t
 
 struct command_holder
 {
-  const std::uint32_t value;   // ボタンコマンドヒット時の識別値
-  const std::uint_fast8_t len; // ボタンコマンド長
+  const uint32_t value;   // ボタンコマンドヒット時の識別値
+  const uint_fast8_t len; // ボタンコマンド長
   const bits_btn_t* inputs;    // ボタンコマンド配列
 };
 
-static constexpr std::size_t BTN_STACK_MAX = 8; // ボタン状態の入力履歴保持数 （コマンド列以上の値にすること）
+static constexpr size_t BTN_STACK_MAX = 8; // ボタン状態の入力履歴保持数 （コマンド列以上の値にすること）
 
 // 判定対象となるコマンド列の作成
 // 例: 0, bit_btn_b, 0, bit_btn_a, 0 
@@ -66,8 +66,8 @@ static constexpr command_holder commands[] =
 class LovyanGFX_Btn
 {
 public:
-  std::uint32_t msec_debounce = 50;  // デバウンス処理の待ち時間
-  std::uint32_t msec_hold = 250;     // 長押し判定の待ち時間
+  uint32_t msec_debounce = 50;  // デバウンス処理の待ち時間
+  uint32_t msec_hold = 250;     // 長押し判定の待ち時間
 
   void setup(void)
   {
@@ -78,10 +78,10 @@ public:
     for (auto pin : _gpio) { pinMode(pin, INPUT); }
   }
 
-  std::uint32_t hitcheck(void)
+  uint32_t hitcheck(void)
   {
-    std::uint32_t hitres = 0;
-    std::uint_fast8_t hitlen = 0;
+    uint32_t hitres = 0;
+    uint_fast8_t hitlen = 0;
 
     // 登録されているコマンドと一致するものを探すループ
     for (const auto& cmd : commands)
@@ -104,10 +104,10 @@ public:
   bool loop(void)
   {
     // 現在のミリ秒時間を取得
-    std::uint32_t msec = millis();
+    uint32_t msec = millis();
 
     // ボタンのGPIOの状態をbtnsにビット列として取得
-    std::uint32_t btns = 0;
+    uint32_t btns = 0;
     for (int i = 0; i < BTN_MAX; ++i) { if (_gpio[i] >= 0 && !digitalRead(_gpio[i])) btns |= 1 << i; }
 
     // 記録しているボタンの状態と比較
@@ -158,15 +158,15 @@ public:
   }
 
   // コマンド判定後の値を取得する
-  std::uint32_t getValue(void) const { return _hitvalue; }
+  uint32_t getValue(void) const { return _hitvalue; }
 
   // ボタン入力履歴の配列を取得する
   const bits_btn_t* getStack(void) const { return _btns_stack; }
 
 private:
-  std::uint32_t _hitvalue;           // コマンド判定でヒットした値
-  std::int32_t _gpio[BTN_MAX];       // ボタンのGPIOリスト
-  std::uint32_t _msec_changed = 0;   // 入力変化時点の時間記録
+  uint32_t _hitvalue;           // コマンド判定でヒットした値
+  int32_t _gpio[BTN_MAX];       // ボタンのGPIOリスト
+  uint32_t _msec_changed = 0;   // 入力変化時点の時間記録
   bits_btn_t _btns_before_db = 0;    // デバウンス処理前のボタン状態記録
   bits_btn_t _btns_after_db = 0;     // デバウンス処理後のボタン状態記録
   bits_btn_t _btns_stack[BTN_STACK_MAX]; // ボタン状態の履歴

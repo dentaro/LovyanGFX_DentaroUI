@@ -1,11 +1,11 @@
 #include "TouchBtn.hpp"
 
-//TouchBtn::TouchBtn(LGFX& _lcd)
+//TouchBtn::TouchBtn(LGFX& )
 //{
-//// lcd = _lcd;
+//// lcd = ;
 //}
 
-//TouchBtn::TouchBtn(LGFX& _lcd): lcd(_lcd) {lcd = _lcd;}
+//TouchBtn::TouchBtn(LGFX& ): lcd() {lcd = ;}
 
 void TouchBtn::setlayoutSpritePos(lgfx::v1::touch_point_t _layoutSpritePos)
 {
@@ -256,7 +256,7 @@ void TouchBtn::addHandler(DelegateBase2* _func){
 }
 
 void TouchBtn::delHandlers2(){
-      std::list<DelegateBase2*>::iterator ite2 =  lim2.begin();
+      list<DelegateBase2*>::iterator ite2 =  lim2.begin();
       while( ite2 != lim2.end() )
       {
         // DelegateBase2 *ptr = (*ite2);
@@ -280,7 +280,7 @@ void TouchBtn::run2(int _btnID, int _btnNo, int _sx, int _sy, int _tx, int _ty, 
 
       
       
-      std::list<DelegateBase2*>::iterator ite2 =  lim2.begin();
+      list<DelegateBase2*>::iterator ite2 =  lim2.begin();
       while( ite2 != lim2.end() )
       {
         DelegateBase2 *ptr = (*ite2);

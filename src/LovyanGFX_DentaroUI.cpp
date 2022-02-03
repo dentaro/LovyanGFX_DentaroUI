@@ -1,4 +1,5 @@
 #include "LovyanGFX_DentaroUI.hpp"
+using namespace std;
 
 #define FLICK_DIST 3
 // #include <vector>
@@ -16,7 +17,8 @@ void LovyanGFX_DentaroUI::begin( LGFX* _lcd, String _host, int _shiftNum, int _c
   host = _host;
    SD.end();
   // SDカードがマウントされているかの確認
-  if(!SD.begin(SDCARD_SS_PIN, SDCARD_SPI, 25000000)){
+
+  if(!SD.begin(SDCARD_SS_PIN, SDCARD_SPI, 20000000)){
     Serial.println("Card Mount Failed");
     while (1) {}
   }
@@ -97,11 +99,11 @@ void LovyanGFX_DentaroUI::begin( LGFX* _lcd)
       _lcd->setTextDatum(textdatum_t::top_left);
 
       // タッチを使用する場合、キャリブレーションを行います。画面の四隅に表示される矢印の先端を順にタッチしてください。
-      std::uint16_t fg = TFT_WHITE;
-      std::uint16_t bg = TFT_BLACK;
+      uint16_t fg = TFT_WHITE;
+      uint16_t bg = TFT_BLACK;
       
-      if (_lcd->isEPD()) std::swap(fg, bg);
-      _lcd->calibrateTouch(nullptr, fg, bg, std::max(_lcd->width(), _lcd->height()) >> 3);
+      if (_lcd->isEPD()) swap(fg, bg);
+      _lcd->calibrateTouch(nullptr, fg, bg, max(_lcd->width(), _lcd->height()) >> 3);
     
       _lcd->fillScreen(TFT_BLACK);
       _lcd->setColorDepth(TILE_COL_DEPTH);
@@ -156,28 +158,28 @@ void LovyanGFX_DentaroUI::getTilePos(double _lat, double _lon, int zoom_level)
 
   // //座標を含むタイル番号を計算
   // double lat_rad = _lat * (M_PI/180);
-  // double n = std::pow(2, zoom_level);
+  // double n = _lcdpow(2, zoom_level);
   // xtileNo = int((_lon + 180.0) / 360.0 * n);
   // ytileNo = int((1.0 - log(tan(lat_rad) + (1 / cos(lat_rad))) / M_PI) / 2.0 * n);
   // ztile = zoom_level;
 
   // 緯度経度からタイル座標に変換
-  double x = (_lon / 180 + 1) * std::pow(2, zoom_level) / 2;
+  double x = (_lon / 180 + 1) * pow(2, zoom_level) / 2;
   xtile = int(x*255);
-  double y = ((-log(tan((45 + _lat / 2) * M_PI / 180)) + M_PI) * std::pow(2, zoom_level) / (2 * M_PI));
+  double y = ((-log(tan((45 + _lat / 2) * M_PI / 180)) + M_PI) * pow(2, zoom_level) / (2 * M_PI));
   ytile = int(y*255);
   ztile = zoom_level;
 
   // //座標を含むタイル番号を計算
-  //x = (_lon / 180 + 1) * std::pow(2, zoom_level-1) / 2;
+  //x = (_lon / 180 + 1) * pow(2, zoom_level-1) / 2;
   // xtileNo = int(x);
-  //y = ((-log(tan((45 + _lat / 2) * M_PI / 180)) + M_PI) * std::pow(2, zoom_level-1) / (2 * M_PI));
+  //y = ((-log(tan((45 + _lat / 2) * M_PI / 180)) + M_PI) * pow(2, zoom_level-1) / (2 * M_PI));
   // ytileNo = int(y);
 
 
 // //現在地を含むタイル番号を計算
   double lat_rad = _lat * (M_PI/180);
-  double n = std::pow(2, zoom_level);
+  double n = pow(2, zoom_level);
   xtileNo = int((_lon + 180.0) / 360.0 * n);
   ytileNo = int((1.0 - log(tan(lat_rad) + (1 / cos(lat_rad))) / M_PI) / 2.0 * n);
 }
@@ -437,7 +439,7 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite,
       {
         //最後の文字のバイト数を判定する
         setlocale(LC_ALL, "");
-        std::vector<std::string> ret = split_mb(flickStrDel.c_str(),"\n");
+        vector<string> ret = split_mb(flickStrDel.c_str(),"\n");
         if(ret.size() >= 1)
         {
           //バイト数分消去
@@ -481,7 +483,7 @@ void LovyanGFX_DentaroUI::flickUpdate( LGFX* _lcd, LGFX_Sprite& _layoutSprite,
 void LovyanGFX_DentaroUI::delChar(){
   //最後の文字のバイト数を判定する
   setlocale(LC_ALL, "");
-  std::vector<std::string> ret = split_mb(flickStrDel.c_str(),"\n");
+  vector<string> ret = split_mb(flickStrDel.c_str(),"\n");
 
   if(ret.size() >= 1){
   //バイト数分消去
@@ -497,7 +499,7 @@ void LovyanGFX_DentaroUI::delChar(){
 
 String LovyanGFX_DentaroUI::getKana(int _panelID, int _rowID, int _colID, int _transID){
   String str="";
-  std::string stdstr = "";
+  string stdstr = "";
   stdstr = flickPanels[showFlickPanelNo]->text_list[_rowID].c_str();
 
   if( charMode == CHAR_3_BYTE )
@@ -554,13 +556,13 @@ bool LovyanGFX_DentaroUI::nchr_cmp(const char* c1, const char* c2) {
   return issame;
 }
 
-std::vector<std::string> LovyanGFX_DentaroUI::split_mb(const char* src, const char* del) {
+vector<string> LovyanGFX_DentaroUI::split_mb(const char* src, const char* del) {
 
   char tmp[10];
 
-  std::vector<std::string> result;
+  vector<string> result;
 
-  std::string tmps;
+  string tmps;
   while (*src) {
 
     //デリミタを飛ばす
@@ -666,8 +668,8 @@ String LovyanGFX_DentaroUI::getFlickStr(){
     //押されたボタンのモードがFLICKだったら
     if(touch_btn_list[getTouchBtnID()]->getBtnMode() == TOUCH_FLICK_MODE){
 
-      std::string gettingText = flickPanels[showFlickPanelNo]->text_list[getTouchBtnID() - getUiFirstNo(FlickUiID)].c_str();
-      std::string trimText = "";
+      string gettingText = flickPanels[showFlickPanelNo]->text_list[getTouchBtnID() - getUiFirstNo(FlickUiID)].c_str();
+      string trimText = "";
       flickString ="";
       trimText = gettingText;
 
@@ -830,10 +832,10 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX* _lgfx, LGFX_Sprite& _flickUi
 
       _flickUiSprite.fillScreen(TFT_RED);
 
-      std::string panelText ="０１２３４５６７８";//デフォルトの文字セット
-      //std::string prePanelText ="";
-      std::string gettingText = flickPanels[showFlickPanelNo]->text_list[_btnNo].c_str();//ArduinoのString型をc_str()で、std::string型に直してから、渡す
-      std::string trimText = "";
+      string panelText ="０１２３４５６７８";//デフォルトの文字セット
+      //string prePanelText ="";
+      string gettingText = flickPanels[showFlickPanelNo]->text_list[_btnNo].c_str();//ArduinoのString型をc_str()で、string型に直してから、渡す
+      string trimText = "";
       if(gettingText.size() <= 5)//1バイト文字5文字（英語）以下の場合
       {
         panelText ="";
@@ -915,7 +917,7 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX* _lgfx, LGFX_Sprite& _flickUi
           for(int i = 0; i < 3; i++){
             _flickUiSprite.setTextSize(1);
 
-            flick_touch_btn_list[ j*3+i ]->setBtnName(panelText.substr((j*3+i)*3,3).c_str());//std::string型の状態で一文字切り出して、Stringに渡す
+            flick_touch_btn_list[ j*3+i ]->setBtnName(panelText.substr((j*3+i)*3,3).c_str());//string型の状態で一文字切り出して、Stringに渡す
             // String btn_name = flickPanels[showFlickPanelNo]->btn_name.c_str();
             String btn_name = flick_touch_btn_list[ j*3+i ]->getBtnName();
 
@@ -1443,7 +1445,7 @@ uiBoxes.push_back(*new UiContainer);
     for(int j= 0; j < uiBoxes[uiID].col; j++)
     {
       int p_btnID = _startId + j * uiBoxes[uiID].row + i;
-      std::string stdstr = flickPanels[showFlickPanelNo]->text_list[j * uiBoxes[uiID].row + i].c_str();
+      string stdstr = flickPanels[showFlickPanelNo]->text_list[j * uiBoxes[uiID].row + i].c_str();
       String str = stdstr.substr(0,3).c_str();//先頭文字をラベルにする
       
       touch_btn_list[p_btnID] = NULL;
@@ -1775,7 +1777,7 @@ void LovyanGFX_DentaroUI::setUiLabels(int uiID, int _showFlickPanelNo)
     {
       // int p_btnID = uiBoxes[uiID].b_sNo + j * uiBoxes[uiID].row + i;
       int p_btnID = uiBoxes[uiID].b_sNo + j * uiBoxes[ uiID ].row + i;
-      std::string stdstr = flickPanels[ showFlickPanelNo ]->text_list[ j * uiBoxes[uiID].row + i ].c_str();
+      string stdstr = flickPanels[ showFlickPanelNo ]->text_list[ j * uiBoxes[uiID].row + i ].c_str();
       String str = stdstr.substr( 0, 3 ).c_str();//先頭文字をラベルにする
       touch_btn_list[ p_btnID ]->setBtnName( str );
     }
@@ -1949,7 +1951,7 @@ String LovyanGFX_DentaroUI::getInvisibleFlickStrings(){
   String invisibleStr = "";
   //最後の文字のバイト数を判定する
   setlocale(LC_ALL, "");
-  std::vector<std::string> ret = split_mb(flickStrDel.c_str(),"\n");
+  vector<string> ret = split_mb(flickStrDel.c_str(),"\n");
 
   if(ret.size() >= 1){
 
@@ -1984,7 +1986,7 @@ String LovyanGFX_DentaroUI::getFlickChar(){
 }
 
 String LovyanGFX_DentaroUI::delEndChar(String _str, int _ByteNum){
-  std::string stdFlickStr = _str.c_str();
+  string stdFlickStr = _str.c_str();
   for( int i = 0; i < _ByteNum; i++ ){
     stdFlickStr.erase( --stdFlickStr.end() );
   }
