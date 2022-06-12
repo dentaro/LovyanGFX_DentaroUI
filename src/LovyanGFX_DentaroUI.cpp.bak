@@ -73,11 +73,11 @@ void LovyanGFX_DentaroUI::begin( LGFX& _lcd)
       _lcd.calibrateTouch(nullptr, fg, bg, std::max(_lcd.width(), _lcd.height()) >> 3);
     
       _lcd.fillScreen(TFT_BLACK);
+      // _lcd.setColorDepth(TILE_COL_DEPTH);
 
-      _lcd.setColorDepth(COL_DEPTH);
-      //  if(use_flickUiSpriteF){
-      //    createFlick9Btns(flickUiSprite);//フリック用のボタンを生成
-      //  }
+       if(use_flickUiSpriteF){
+         createFlickBtns(flickUiSprite);//フリック用のボタンを生成
+       }
 
           Serial.printf("heap_caps_get_free_size(MALLOC_CAP_SPIRAM)            : %6d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM) );
           Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA):%d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
@@ -248,31 +248,31 @@ void LovyanGFX_DentaroUI::flickSetup(LGFX_Sprite& _layoutSprite,
                                         LGFX_Sprite& _ui_sprite3, 
                                         LGFX_Sprite& _flickUiSprite){
 
-  if(use_flickUiSpriteF){ 
-
-   createFlick9Btns(_flickUiSprite);//フリック用のボタンを生成
- }
+ 
 
   createLayout( 0, 80, 240, 240, _layoutSprite,  MULTI_EVENT );//LAYOUT_0
   createBtns( 0,    18, 240, 30,  1, 1, _ui_sprite3, MULTI_EVENT );//BTN_1
-  
+  setFlickPanels();//フリックキーボード用プリセット
   createFlicks( 48, 48,  144, 192, 3, 4, _ui_sprite0, MULTI_EVENT );//FLICK_2
 
-  setFlickPanels();//フリックキーボード用プリセット
 // //ここでフリックパネルのカスタマイズができます。
 // //引数は(フリックパネル番号、ボタン番号、登録したい５文字、または９文字)になっています。
 // //  ui.setFlickPanel(0, 0, "あいうえおかきくけ");
 // //  ui.setFlickPanel(0, 1, "臨兵闘者皆陣列前行");
-
+  _flickUiSprite.createSprite( 144, 144 );
   createBtns( 0,   48,  48, 192, 1, 4, _ui_sprite1, MULTI_EVENT );//BTN_3
   createBtns( 192, 48,  48, 192, 1, 4, _ui_sprite2, MULTI_EVENT );//BTN_4
-  
   setFlick( JP , getUiID("BTN_1"), getUiID("FLICK_2"), getUiID("BTN_3"), getUiID("BTN_4"));//立ち上げ時のパネル指定　JP/EN/NUMERIC
   setBtnName( 0, "↓");
 
-  // Serial.println(getUiID("FLICK_2"));
+  Serial.println(getUiID("FLICK_2"));
 
-
+//  if(use_flickUiSpriteF){ 
+//    _flickUiSprite.setPsram(false);//UNUSE_PSRAM
+//    _flickUiSprite.setColorDepth( COL_DEPTH );
+//    _flickUiSprite.createSprite( 144, 144 );
+//    createFlickBtns(_flickUiSprite);//フリック用のボタンを生成
+//  }
   
 }
 void LovyanGFX_DentaroUI::flickUpdate(  LGFX& _lcd, 
@@ -561,23 +561,22 @@ void LovyanGFX_DentaroUI::createToggles(int _x, int _y, int _w,int _h, int _row,
   toggle_mode = false;
 }
 
-void LovyanGFX_DentaroUI::createFlick9Btns(LGFX_Sprite& _flickUiSprite)
+void LovyanGFX_DentaroUI::createFlickBtns(LGFX_Sprite& _flickUiSprite)
 {
   flickPanel.b_sNo = 0;
   flickPanel.id  = 0;
   flickPanel.x   = 0;
   flickPanel.y   = 0;
-  //  flickPanel.w   = 144;
-  //  flickPanel.h   = 144;
+   flickPanel.w   = 144;
+   flickPanel.h   = 144;
   flickPanel.row = 3;
   flickPanel.col = 3;
   // flickPanel.eventNo = _eventNo;
-
-  //  _flickUiSprite.setPsram( USE_PSRAM );
-  _flickUiSprite.setPsram(false);//UNUSE_PSRAM
-  _flickUiSprite.setColorDepth( COL_DEPTH );
-  _flickUiSprite.createSprite( 144, 144 );
-  //  _flickUiSprite.createSprite( flickPanel.w, flickPanel.h );
+  
+  // _flickUiSprite.setPsram( USE_PSRAM );
+  // _flickUiSprite.setPsram(false);//UNUSE_PSRAM
+  // _flickUiSprite.setColorDepth( COL_DEPTH );
+  // _flickUiSprite.createSprite( flickPanel.w, flickPanel.h );
   
   //btnNum = _row * _col ;
   int b_w = 48;
@@ -795,8 +794,8 @@ String LovyanGFX_DentaroUI::getFlickStr(){
 void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX& _lgfx, LGFX_Sprite& _flickUiSprite, int _btnID, int _btnNo, bool _visible, bool _available )
 {
 
-  if(_btnID != NO_EVENT)
-  {
+  // if(_btnID != NO_EVENT)
+  // {
   
     //押されたボタンのモードがFLICKだったら
     if(touch_btn_list[getTouchBtnID()]->getBtnMode() == TOUCH_FLICK_MODE)
@@ -810,8 +809,6 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX& _lgfx, LGFX_Sprite& _flickUi
       //std::string prePanelText ="";
       std::string gettingText = flickPanels[showFlickPanelNo]->text_list[_btnNo].c_str();//ArduinoのString型をc_str()で、std::string型に直してから、渡す
       std::string trimText = "";
-
-      
       if(gettingText.size() <= 5)//1バイト文字5文字（英語）以下の場合
       {
         panelText ="";
@@ -894,16 +891,11 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX& _lgfx, LGFX_Sprite& _flickUi
             _flickUiSprite.setTextSize(1);
 
             flick_touch_btn_list[ j*3+i ]->setBtnName(panelText.substr((j*3+i)*3,3).c_str());//std::string型の状態で一文字切り出して、Stringに渡す
-            // flick_touch_btn_list[ j*3+i ]->setBtnName(panelText.substr(3,3).c_str());//std::string型の状態で一文字切り出して、Stringに渡す
-            
             // String btn_name = flickPanels[showFlickPanelNo]->btn_name.c_str();
             String btn_name = flick_touch_btn_list[ j*3+i ]->getBtnName();
 
-            // Serial.print(panelText.substr((j*3+i)*3,3).c_str());
-            // Serial.println(btn_name);
-
             //flick_touch_btn_list[i*3+j]->btn_mode = BTN_MODE_FLICK;
-            // flick_touch_btn_list[j*3+i]->flickDraw( _flickUiSprite ); //使わない
+            flick_touch_btn_list[j*3+i]->flickDraw( _flickUiSprite ); 
             _flickUiSprite.fillRoundRect(
               // flick_touch_btn_list[i]->getBtnPos().x, 
               // flick_touch_btn_list[i]->getBtnPos().y, 
@@ -912,18 +904,15 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX& _lgfx, LGFX_Sprite& _flickUi
                 48,//flick_touch_btn_list[i]->getBtnSize().w, 
                 48,//flick_touch_btn_list[i]->getBtnSize().h, 
                 10, TFT_WHITE);
-
             if(btn_name == NULL){
               btn_name = String(j*3+i);
             }
-
-            _flickUiSprite.setTextColor( TFT_BLACK );
+            _flickUiSprite.setTextColor( TFT4_BLACK );
             _flickUiSprite.setFont(&lgfxJapanGothicP_20);
             int b_hw = 48/2;
             int b_hh = 48/2;
             float b_str_hw = _flickUiSprite.textWidth( btn_name ) / 2;
-            // _flickUiSprite.drawString( flick_touch_btn_list[ j*3+i ]->getBtnName(), 48*i + b_hw - b_str_hw , 48*j + b_hh - 4 );
-            _flickUiSprite.drawString( btn_name, 48*i + b_hw - b_str_hw , 48*j + b_hh - 4 );
+            _flickUiSprite.drawString( flick_touch_btn_list[ j*3+i ]->getBtnName(), 48*i + b_hw - b_str_hw , 48*j + b_hh - 4 );
           }
         }
 
@@ -937,7 +926,7 @@ void LovyanGFX_DentaroUI::drawFlickBtns( LovyanGFX& _lgfx, LGFX_Sprite& _flickUi
     // }
     }
 
-  }
+  // }
 
 }
 
@@ -1790,12 +1779,7 @@ void LovyanGFX_DentaroUI::setFlickPanels(){
   //パネル番号、ボタン番号、表示文字９個
   //ui.setFlickPanel(0, 0, "あいうえおかきくけ");//9文字はいまのところ未対応
 
-  // int _b_sNo = uiBoxes[FlickUiID].b_sNo;//FlickUiIDは1
-  // int _b_sNo = getUiFirstNo(FlickUiID);
-  //Serial.println(getUiFirstNo(getUiID("FLICK_2")));
-  // Serial.println(getUiID("FLICK_2"));
-  int _b_sNo = uiBoxes[getUiID("FLICK_2")].b_sNo;
-  // int _b_sNo = 1;//
+  int _b_sNo = uiBoxes[FlickUiID].b_sNo;//FlickUiIDは1
 
   setCharMode(CHAR_3_BYTE);
   // //全角5文字になるように空白を入れて文字を登録
