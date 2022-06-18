@@ -1,28 +1,28 @@
 #pragma once //インクルードガード
 
-using namespace std;
-#define SDCARD_SS_PIN 4 //M5toughのSD_CSは4
-#define SDCARD_SPI SPI
-
+#include "FS.h"
 #include "SD.h"
+#include "SPI.h"
+#include "Arduino.h"
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
 
-
-
 //M5stackなどの製品で使用するときはAUTODETECTを使って下さい。
-#include <LGFX_AUTODETECT.hpp>
+//#include <LGFX_AUTODETECT.hpp>
 
 //自作基板などで、AUTODETECTの代わりにカスタム設定を使いたいときはこちらを編集して下さい。
-//#include "LGFX_ESP32_custom_320_240.hpp"
+#include "LGFX_ESP32_custom_sample.hpp"
+
+using namespace std;
 
 #include <list>
 
+
 #define USE_PSRAM true
 
-#define COL_DEPTH 4
-#define TILE_COL_DEPTH 16
-#define TILE_CHILD_COL_DEPTH 8
+#define COL_DEPTH 16
+// #define TILE_COL_DEPTH 16
+// #define TILE_CHILD_COL_DEPTH 8
 
 #define TOUCH_NONE_MODE -1
 #define TOUCH_BTN_MODE 0
@@ -174,11 +174,11 @@ class TouchBtn {
     float sliderValx = 0.5;
     float sliderValy = 0.5;
 
-    bool drawFinishF = false;
-
 public:
-    TouchBtn(LGFX* _lcd): lcd(_lcd) {}
-    LGFX* lcd;
+    // TouchBtn(LGFX* _lcd): lcd(_lcd) {}
+    // LGFX* lcd;
+    TouchBtn();
+
     void initBtn(int _btnId, String _btnIDlabel, int _x, int _y, int _w, int _h, String _name, 
     lgfx::v1::touch_point_t _layoutSpritePos,
     lgfx::v1::touch_point_t _spritePos,
@@ -193,7 +193,7 @@ public:
     LGFX_Sprite& _sprite,
     int _visible_mode );
     
-    void initTile(int _btnID,String _btn_name, lgfx::v1::touch_point_t _layoutSpritePos, int layoutSprite_w, int layoutSprite_h, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _g_basic_sprite);
+    // void initTile(int _btnID,String _btn_name, lgfx::v1::touch_point_t _layoutSpritePos, int layoutSprite_w, int layoutSprite_h, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _g_basic_sprite);
     // void setBtnName(String _btnName);
     void setBtnNameFalse(String _btnNameFalse);
     void btnDraw(LGFX_Sprite& _sprite);
@@ -216,7 +216,7 @@ public:
     void setBtnName(String _btn_name);
     String getBtnName();
     
-    void setPngTile(fs::FS &fs, String _m_url, LGFX_Sprite& _g_basic_sprite);
+    // void setPngTile(fs::FS &fs, String _m_url, LGFX_Sprite& _g_basic_sprite);
     lgfx::v1::touch_point_t getTouchPoint(int _x, int _y);
     lgfx::v1::touch_point_t getBtnPos();
     
@@ -231,8 +231,5 @@ public:
     // lgfx::v1::touch_point_t  getTilePos();
     void setTilePos(lgfx::v1::touch_point_t _pos);
     int get_xy_mode();
-
-    void setDrawFinishF(bool _drawFinishF);
-    bool getDrawFinishF();
 
 };

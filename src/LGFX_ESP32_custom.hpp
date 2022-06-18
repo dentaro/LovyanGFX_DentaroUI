@@ -4,6 +4,9 @@
 
 // #include <LovyanGFX.hpp>
 
+#define SDCARD_SS_PIN 5
+#define SDCARD_SPI SPI
+
 class LGFX : public lgfx::LGFX_Device
 {
 
