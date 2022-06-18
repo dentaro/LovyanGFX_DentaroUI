@@ -16,8 +16,8 @@
 //SLIDER_0=[0]
 //BTN_1=[1]
 
-static LGFX lcd;// LGFXのインスタンスを作成
-LovyanGFX_DentaroUI ui( &lcd );//lcdを入れる
+LGFX lcd;// LGFXのインスタンスを作成
+LovyanGFX_DentaroUI ui;//lcdを入れる
 static std::uint32_t sec, psec;
 static std::uint32_t fps = 0, frame_count = 0;
 static LGFX_Sprite ui_sprite0( &lcd );//スライダ用
@@ -26,8 +26,7 @@ int v,r,g,b = 127;
 void setup() {
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
   //lcd.init();lcd.begin();lcd.setRotation(1);lcd.setColorDepth(24);//ここでlcd関係を宣言するとなぜかタッチパネルキャリブレーションができます。
-  ui.begin( &lcd );//uiを使うための準備
-  ui.begin( &lcd, 24, 3, true );//lcd, 色深度,回転方向,タッチキャリブレーションの有無
+  ui.begin( lcd, 5, 24, 3, true );//lcd, 色深度,回転方向,タッチキャリブレーションの有無//uiを使うための準備
   ui.createSliders( 0,   140, 180, 180, 1, 4, ui_sprite0, X_VAL, MULTI_EVENT);
   //スライダ用の箱を用意(x,y,w,h)し、x方向1列、y方向4行に区切ったスライダを生成します。
   //X方向の値（X_VAL）を利用します。
@@ -55,13 +54,13 @@ void setup() {
   ui.setSliderVal( ui.getUiID("SLIDER_0"), 0 , 1.0, 0.5 ); 
   v = 255;
   //スライダボタンを描画します。
-  ui.drawSliders( ui.getUiID("SLIDER_0"), &lcd, ui_sprite0 );
+  ui.drawSliders( ui.getUiID("SLIDER_0"), lcd, ui_sprite0 );
   //トグルボタンを描画します。
-  ui.drawToggles( ui.getUiID("BTN_1"),    &lcd, ui_sprite1 );
+  ui.drawToggles( ui.getUiID("BTN_1"),    lcd, ui_sprite1 );
 
 }
 void loop( void ){
-  ui.update( &lcd );//この一行でタッチボタンイベントを取得します。
+  ui.update( lcd );//この一行でタッチボタンイベントを取得します。
 
   //タッチされたボタン（スライダ）のID番号を取得し、UIコンテナ内のボタン番号と一致したら、スライダの値を変数に格納します。
   if( ui.getTouchBtnID() == ui.getUiFirstNo( ui.getUiID("SLIDER_0") )   ){ v = int( ui.getSliderVal( ui.getUiID("SLIDER_0"), 0 )*255 ); }
@@ -75,17 +74,17 @@ void loop( void ){
   if( ui.getToggleVal( ui.getUiID("BTN_1"), 2 ) == true){ui.setSliderVal( ui.getUiID("SLIDER_0"), 2 , 1.0, 0.5 ); g = 255;}
   if( ui.getToggleVal( ui.getUiID("BTN_1"), 3 ) == true){ui.setSliderVal( ui.getUiID("SLIDER_0"), 3 , 1.0, 0.5 ); b = 255;}
 
-  //何かしらのイベントが発生したときだけ、矩形を描画し、画面輝度を変えます。
-  if( ui.getEvent() != NO_EVENT ){ lcd.fillRect( 0, 40, 240, 100, lcd.color888( r,g,b ) ); lcd.setBrightness( v );};
-  
-  //スライダボタンを描画します。
-  ui.drawSliders( ui.getUiID("SLIDER_0"), &lcd, ui_sprite0 );
-  
-  //トグルボタンを描画します。
-  ui.drawToggles( ui.getUiID("BTN_1"),    &lcd, ui_sprite1 );
+  // //何かしらのイベントが発生したときだけ、矩形を描画し、画面輝度を変えます。
+  if( ui.getEvent() != NO_EVENT ){
+    lcd.fillRect( 0, 40, 240, 100, lcd.color888( r,g,b ) ); lcd.setBrightness( v );
+  //   //スライダボタンを描画します。
+    ui.drawSliders( ui.getUiID("SLIDER_0"), lcd, ui_sprite0 );
+  //   //トグルボタンを描画します。
+    ui.drawToggles( ui.getUiID("BTN_1"),    lcd, ui_sprite1 );
+  }
 
-  ui.showTouchEventInfo( &lcd, lcd.width() - 100, 0 );//タッチイベントを視覚化する
-  ui.showInfo( &lcd );//ボタン情報、フレームレート情報などを表示します。
+  ui.showTouchEventInfo( lcd, lcd.width() - 80, 0 );//タッチイベントを視覚化する
+  ui.showInfo( lcd ,0, 48);//ボタン情報、フレームレート情報などを表示します。
   //WDT対策
   delay(1);
 }
