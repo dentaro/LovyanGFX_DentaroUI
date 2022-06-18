@@ -549,9 +549,9 @@ void LovyanGFX_DentaroUI::updateSelectBtnID(int _selectBtnID){
  selectBtnID = _selectBtnID;
 }
 
-void LovyanGFX_DentaroUI::showTouchEventInfo(LovyanGFX* _lgfx, int _x, int _y){
+void LovyanGFX_DentaroUI::showTouchEventInfo(LovyanGFX& _lgfx, int _x, int _y){
   for(int i = 0; i < 5; i++){
-    _lgfx->fillRect(_x + 1 + 10*i, _y, 9,9,clist[0]);
+    _lgfx.fillRect(_x + 1 + 10*i, _y, 9,9,clist[0]);
   }
 }
 
@@ -968,7 +968,10 @@ void LovyanGFX_DentaroUI::createBtns(//修正中
   uiBoxes[uiID].row = _row;
   uiBoxes[uiID].col = _col;
   uiBoxes[uiID].eventNo = _eventNo;
-  // uiBoxes[uiID].toggle_mode = toggle_mode;
+  
+  uiBoxes[uiID].toggle_mode = toggle_mode;
+
+
   // uiBoxes[uiID].parentID = _parentID;
   
   // _uiSprite.setPsram(USE_PSRAM);
@@ -1084,6 +1087,9 @@ void LovyanGFX_DentaroUI::createBtns(
     uiBoxes[uiID].row = _row;
     uiBoxes[uiID].col = _col;
     uiBoxes[uiID].eventNo = _eventNo;
+    uiBoxes[uiID].toggle_mode = toggle_mode;
+    // if(touch_btn_list[ _btnID ]->btn_mode == TOUCH_TOGGLE_MODE) uiBoxes[uiID].toggle_mode = true;
+    // if(touch_btn_list[ _btnID ]->btn_mode  == TOUCH_TOGGLE_MODE) uiBoxes[uiID].toggle_mode = false;
     // uiBoxes[uiID].parentID = _parentID;
     
     // _uiSprite.setPsram( USE_PSRAM );
@@ -1277,10 +1283,12 @@ void LovyanGFX_DentaroUI::drawBtns( int uiID, LovyanGFX& _lgfx, LGFX_Sprite& _ui
     for(int i= _id; i < _id + _btnNum; i++)
     {
       touch_btn_list[i]->setSelectBtnF(false);
-      
       if(selectBtnID == i)touch_btn_list[i]->setSelectBtnF(true);
       else touch_btn_list[i]->setSelectBtnF(false);
+
       touch_btn_list[i]->btnDraw(_uiSprite); 
+
+
       
       // if(_showMethod == SHOW_ALL)
       // {
@@ -1355,10 +1363,24 @@ void LovyanGFX_DentaroUI::drawBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _ui
 // }
 
 void LovyanGFX_DentaroUI::drawToggles(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite){
-  drawToggles(_uiID, _lgfx, _uiSprite, uiBoxes[_uiID].x, uiBoxes[_uiID].y);
+  if( getEvent() == TOUCH ){
+    if( _uiID >= 0 ){ //NULLを除外
+      switchToggleVal();
+      drawToggles(_uiID, _lgfx, _uiSprite, uiBoxes[_uiID].x, uiBoxes[_uiID].y);
+    }else{
+
+    }
+  }
+  // if( getEvent() != NO_EVENT ){
+    
+  // }
 }
 
 void LovyanGFX_DentaroUI::drawToggles(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _x, int _y){
+  
+  // if(uiBoxes[_uiID].toggle_mode  == true){
+  //   drawBtns(_uiID, _lgfx, _uiSprite, _x, _y);
+  // }
   toggle_mode = true;
   drawBtns(_uiID, _lgfx, _uiSprite, _x, _y);
   toggle_mode = false;
@@ -1413,7 +1435,7 @@ uiBoxes.push_back(*new UiContainer);
   uiBoxes[uiID].row = _row;
   uiBoxes[uiID].col = _col;
   uiBoxes[uiID].eventNo = _eventNo;
-  // uiBoxes[uiID].toggle_mode = toggle_mode;
+  uiBoxes[uiID].toggle_mode = false;
   // uiBoxes[uiID].parentID = _parentID;
   
   // _uiSprite.setPsram(USE_PSRAM);
@@ -1675,8 +1697,18 @@ int LovyanGFX_DentaroUI::getCharMode(){
 
 bool LovyanGFX_DentaroUI::getToggleVal(int _uiID, int _btnNo){
   int _btnID = uiBoxes[uiID].b_sNo + _btnNo;
-  return touch_btn_list[_btnID]->getToggleVal();
+  // touch_btn_list[_btnID]->switchToggleVal();//値をスイッチしておいて
+  return touch_btn_list[_btnID]->getToggleVal();//スイッチした値をリターンする
 }
+
+// bool LovyanGFX_DentaroUI::getToggleVal(int _btnID){
+//   // touch_btn_list[_btnID]->switchToggleVal();//値をスイッチしておいて
+//   return touch_btn_list[_btnID]->getToggleVal();
+// }
+
+// bool LovyanGFX_DentaroUI::getToggleVal2(){
+//   return obj_ret.toggleVal;
+// }
 
 int LovyanGFX_DentaroUI::getUiFirstNo(int uiID){
   return uiBoxes[uiID].b_sNo;
@@ -1732,52 +1764,54 @@ void LovyanGFX_DentaroUI::setUiLabels(int uiID, int _showFlickPanelNo)
   }
 }
 
-void LovyanGFX_DentaroUI::showInfo(LGFX& _lgfx , int _infox, int _infoy){
-  //showTouchEventInfo( _lgfx, _lgfx.width() - 100, 0 );//タッチイベントを視覚化する
+// void LovyanGFX_DentaroUI::showInfo(LGFX& _lgfx , int _infox, int _infoy){
+//   //showTouchEventInfo( _lgfx, _lgfx.width() - 100, 0 );//タッチイベントを視覚化する
+//   //フレームレート情報などを表示します。
+//   _lgfx.fillRect( _infox, _infoy, 100, 10, TFT_BLACK );
+//   _lgfx.setTextSize(2);
+//   _lgfx.setTextColor( TFT_WHITE );
+//   _lgfx.setCursor( _infox + 1, _infoy + 1 );
+//   _lgfx.print( fps );
+//   _lgfx.print( ":" );
+//   _lgfx.print( String( getEvent() ) );
+//   _lgfx.print( "[" );
+//   _lgfx.print( String( getPreEvent() ) );
+//   _lgfx.print( "]:BTN" );
+//   _lgfx.println( String( getTouchBtnID() ) );
+//   ++frame_count;sec = millis() / 1000;
+//   if ( psec != sec ) {
+//     psec = sec; fps = frame_count; 
+//     frame_count = 0; 
+//     _lgfx.setAddrWindow( 0, 0, _lgfx.width(), _lgfx.height() ); 
+//     //_lgfx.setAddrWindow( 0, 0, 240, 320 ); 
+//   }
+// }
+
+
+void LovyanGFX_DentaroUI::showInfo(LovyanGFX& _lgfx , int _infox, int _infoy){
   //フレームレート情報などを表示します。
-  _lgfx.fillRect( _infox, _infoy, 100, 10, TFT_BLACK );
-  _lgfx.setTextSize(2);
+  _lgfx.setTextSize(1);
+  _lgfx.setFont(&lgfxJapanGothicP_8);
+  _lgfx.fillRect( 0, 0, 150, 10, TFT_BLACK );
   _lgfx.setTextColor( TFT_WHITE );
-  _lgfx.setCursor( _infox + 1, _infoy + 1 );
+  _lgfx.setCursor( 1,1 );
   _lgfx.print( fps );
   _lgfx.print( ":" );
   _lgfx.print( String( getEvent() ) );
   _lgfx.print( "[" );
   _lgfx.print( String( getPreEvent() ) );
   _lgfx.print( "]:BTN" );
-  _lgfx.println( String( getTouchBtnID() ) );
+  _lgfx.print( "[" );
+  _lgfx.print( String( getFlickEvent() ) );
+  _lgfx.print( "]:BTN" );
+  _lgfx.print( String( getTouchBtnID() ) );
+  _lgfx.print( ":" );
+  // _lgfx.println( String( getToggleVal(1,0) ) );
   ++frame_count;sec = millis() / 1000;
   if ( psec != sec ) {
     psec = sec; fps = frame_count; 
     frame_count = 0; 
     _lgfx.setAddrWindow( 0, 0, _lgfx.width(), _lgfx.height() ); 
-    //_lgfx.setAddrWindow( 0, 0, 240, 320 ); 
-  }
-}
-
-
-void LovyanGFX_DentaroUI::showInfo(LovyanGFX* _lgfx , int _infox, int _infoy){
-  //フレームレート情報などを表示します。
-  _lgfx->setTextSize(1);
-  _lgfx->setFont(&lgfxJapanGothicP_8);
-  _lgfx->fillRect( 0, 0, 150, 10, TFT_BLACK );
-  _lgfx->setTextColor( TFT_WHITE );
-  _lgfx->setCursor( 1,1 );
-  _lgfx->print( fps );
-  _lgfx->print( ":" );
-  _lgfx->print( String( getEvent() ) );
-  _lgfx->print( "[" );
-  _lgfx->print( String( getPreEvent() ) );
-  _lgfx->print( "]:BTN" );
-  _lgfx->print( "[" );
-  _lgfx->print( String( getFlickEvent() ) );
-  _lgfx->print( "]:BTN" );
-  _lgfx->println( String( getTouchBtnID() ) );
-  ++frame_count;sec = millis() / 1000;
-  if ( psec != sec ) {
-    psec = sec; fps = frame_count; 
-    frame_count = 0; 
-    _lgfx->setAddrWindow( 0, 0, _lgfx->width(), _lgfx->height() ); 
   }
 }
 
@@ -1954,4 +1988,13 @@ void LovyanGFX_DentaroUI::setLayoutPosToAllBtn( lgfx::v1::touch_point_t  _layout
     touch_btn_list[ i ]->setlayoutSpritePos(_layoutPos);
   }
 }
-  
+
+void LovyanGFX_DentaroUI::switchToggleVal()
+{
+  if(getTouchBtnID()>=0){ //NULLを除外
+    touch_btn_list[getTouchBtnID()]->switchToggleVal();
+  }else{
+
+  }
+
+}

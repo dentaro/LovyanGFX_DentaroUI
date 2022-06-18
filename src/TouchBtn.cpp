@@ -94,12 +94,12 @@ void TouchBtn::btnDraw(LGFX_Sprite& _uiSprite)
   
   if(this->btn_mode == TOUCH_TOGGLE_MODE)//トグルボタンの時
   {
-    if(this->toggleVal == true){
+    if(getToggleVal() == true){
       _uiSprite.fillRoundRect(this->b_x, this->b_y, this->b_w, this->b_h, 10, TFT_WHITE);
       _uiSprite.setTextColor(TFT_BLACK);
       drawName = btn_name;
       }
-    else if(this->toggleVal == false){
+    else if(getToggleVal() == false){
       _uiSprite.fillRoundRect(this->b_x, this->b_y, this->b_w, this->b_h, 10, TFT_BLACK);
       _uiSprite.setTextColor(TFT_WHITE);
       drawName = btn_nameFalse;
@@ -269,6 +269,7 @@ void TouchBtn::delHandlers2(){
 
 void TouchBtn::run2(int _btnID, int _btnNo, lgfx::v1::touch_point_t _sp, lgfx::v1::touch_point_t _tp, int _eventState, int _runEventNo)
 {
+  // this->switchToggleVal();
   run2(_btnID, _btnNo, _sp.x, _sp.y, _tp.x, _tp.y, _eventState, _runEventNo);
 }
 
@@ -279,14 +280,13 @@ void TouchBtn::run2(int _btnID, int _btnNo, int _sx, int _sy, int _tx, int _ty, 
       tp.y = _ty;
 
       eventState = _eventState;
-      runEventNo = _runEventNo;
-
-      
+      runEventNo = _runEventNo;      
       
       std::list<DelegateBase2*>::iterator ite2 =  lim2.begin();
       while( ite2 != lim2.end() )
       {
         DelegateBase2 *ptr = (*ite2);
+        
 
         if(btn_mode == TOUCH_TILE_MODE){
           if(sp.x > b_x 
@@ -304,10 +304,11 @@ void TouchBtn::run2(int _btnID, int _btnNo, int _sx, int _sy, int _tx, int _ty, 
           && sp.y < b_y+b_h + layoutSpritePos.y + this->uiSpritePos.y)
           {//ボタンの領域内に入っていれば
           if(availableF == true){
+            // this->switchToggleVal();
             (*ptr)( _btnID );    // 関数を実行！
           }
             // if(eventState == runEventNo)this->switchToggleVal();
-            if(eventState == runEventNo && eventState != NO_EVENT)this->switchToggleVal();
+            // if(eventState == runEventNo && eventState != NO_EVENT)this->switchToggleVal();
           }
         }
         else if(btn_mode == TOUCH_FLICK_MODE)//FLICK_MODEもこちらで処理
@@ -321,7 +322,7 @@ void TouchBtn::run2(int _btnID, int _btnNo, int _sx, int _sy, int _tx, int _ty, 
             (*ptr)( _btnID );    // 関数を実行！
           }
             // if(eventState == runEventNo)this->switchToggleVal();
-            if(eventState == runEventNo && eventState != NO_EVENT)this->switchToggleVal();
+            // if(eventState == runEventNo && eventState != NO_EVENT)this->switchToggleVal();
           }
         }
         else if(btn_mode == TOUCH_SLIDER_MODE)
@@ -374,7 +375,9 @@ lgfx::v1::touch_point_t TouchBtn::getTouchPoint(int _x, int _y){
 }
 
 void TouchBtn::switchToggleVal(){
-  this->toggleVal = !this->toggleVal;
+  if(this->toggleVal == true)this->toggleVal = false;
+  else if(this->toggleVal == false)this->toggleVal = true;
+  else ;
 }
 
 float TouchBtn::getSliderValx(){

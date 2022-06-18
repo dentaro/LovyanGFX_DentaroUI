@@ -57,6 +57,7 @@ class RetClass {
 public:
   int btnID = -1;
   int btnNo = -1;
+  // bool toggleVal = true;
   lgfx::v1::touch_point_t sp;
   
   void reset(){
@@ -66,15 +67,20 @@ public:
     sp.y = 0;
   }
 
-  int ret0(int _btnID){
+  int ret0_return_btnID(int _btnID){
     btnID = _btnID;
     return btnID;
   }
 
-  int ret1(int _btnNo){
+  int ret1_return_btnNo(int _btnNo){
     btnNo = _btnNo;
     return btnNo;
   }
+
+  // bool ret2_switch_toggle(bool _toggleVal){
+  //   toggleVal != _toggleVal;
+  //   return toggleVal;
+  // }
   
   void func01(int _btnID, int _x, int _y, int _eventState, int _runEventNo) {   // 関数プロトタイプ「void xxx(int,int,int,int);」
     btnID = _btnID;
@@ -124,6 +130,7 @@ class UiContainer{
   int eventNo = -1; //MULTI_EVENT=-1
   int parentID = 0;
   String label = "";
+  bool toggle_mode = false;
   //std::vector<int, int> uiPos = {0, 0};
   //std::vector<std::pair<int, int>> uiPos ={ {x, y}, {w, h} };
 };
@@ -327,9 +334,11 @@ public:
     lgfx::v1::touch_point_t getPos();//タッチしている座標を取得
     void setPos(int _x, int _y);
     void setStartPos(int _x, int _y);
-    DelegateBase2 *ret0_DG = Delegate2<RetClass>::createDelegator2( &obj_ret, &RetClass::ret0 );//型式が違うプロトタイプ関数
+    DelegateBase2 *ret0_DG = Delegate2<RetClass>::createDelegator2( &obj_ret, &RetClass::ret0_return_btnID );//型式が違うプロトタイプ関数
 
-    DelegateBase2 *ret1_DG = Delegate2<RetClass>::createDelegator2( &obj_ret, &RetClass::ret1 );//型式が違うプロトタイプ関数
+    DelegateBase2 *ret1_DG = Delegate2<RetClass>::createDelegator2( &obj_ret, &RetClass::ret1_return_btnNo );//型式が違うプロトタイプ関数
+    
+    // DelegateBase2 *ret2_DG = Delegate2<RetClass>::createDelegator2( &obj_ret, &RetClass::ret2_switch_toggle );//型式が違うプロトタイプ関数
 
     void setLayoutPos( int _x, int _y );
 
@@ -369,14 +378,16 @@ public:
     int getTouchBtnID();//タッチされたボタンオブジェクトのIDを取得
     int getEvent();
     int getFlickEvent();
-    void showTouchEventInfo(LovyanGFX* _lgfx, int _x, int _y);
+    void showTouchEventInfo(LovyanGFX& _lgfx, int _x, int _y);
     lgfx::v1::touch_point_t getTouchPoint(int _x, int _y);
     float getSliderVal( int uiID, int _btnNo );
     float getSliderVal(int uiID,int _btnNo, int _xy);
     Vec2 getSliderVec2( int uiID, int _btnNo );
 
     void setSliderVal(int uiID, int _btnNo, float _x, float _y);
-    bool getToggleVal(int _uiID, int _btnID);
+    bool getToggleVal(int _uiID, int _btnNo);
+    // bool getToggleVal(int _btnID);
+    // bool getToggleVal2();
 
     void setAllBtnAvailableF(int uiID, bool _available);
     void setAvailableF(int uiID, int _btnID, bool _available);
@@ -405,9 +416,9 @@ public:
     lgfx::v1::touch_point_t getBtnPos(int _btnID);
 
     //void showInfo(LGFX& _lgfx );
-    void showInfo(LGFX& _lgfx , int _infox, int _infoy);
+    // void showInfo(LGFX& _lgfx , int _infox, int _infoy);
     // void showInfo( LovyanGFX* _lgfx );
-    void showInfo( LovyanGFX* _lgfx, int _infox, int _infoy);
+    void showInfo( LovyanGFX& _lgfx, int _infox, int _infoy);
 
     String getHenkanChar(int _henkanListNo, int _kanaShiftNo);
     void setFlickPanels();//キーボード用プリセット
@@ -432,6 +443,7 @@ public:
     String delEndChar(String _str, int _ByteNum);
 
     void delChar();
+    void switchToggleVal();
 
 //  getTouchingDist();//タッチしている距離を取得
 //  getTouchingTime();//タッチしている時間を取得
