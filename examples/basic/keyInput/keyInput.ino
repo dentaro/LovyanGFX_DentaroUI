@@ -12,7 +12,7 @@ void setup() {
 }
 void loop( void ){
   ui.update( lcd );
-  if( ui.getEvent() != NO_EVENT ){//何かイベントがあれば
+  if( ui.getEvent() != NO_EVENT && ui.getTouchBtnID()>=0){//何かイベントがあれば
     if(ui.getTouchBtnID() == 0) btnNo = 0;
     else if(ui.getTouchBtnID() == 1) btnNo = 1;
     else if(ui.getTouchBtnID() == 2) btnNo = 2;

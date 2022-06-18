@@ -3,18 +3,18 @@
 #define SLIDER_NO_0 0
 #define SLIDER_NO_1 1
 static LGFX lcd;
-LovyanGFX_DentaroUI ui( &lcd );
+LovyanGFX_DentaroUI ui;
 static LGFX_Sprite ui_sprite0( &lcd );//スライダ用
 void setup(){
   Serial.begin( 115200 ); delay( 50 );  // Serial Init Wait
-  ui.begin( &lcd, 3, 24, 3, true );//lcd, 色深度,回転方向,タッチキャリブレーション
+  ui.begin( lcd, 3, 24, 3, true );//lcd, 色深度,回転方向,タッチキャリブレーション
   ui.createSliders( 0, 160, 240, 160, 2, 1, ui_sprite0, XY_VAL, MULTI_EVENT );
   ui.setBtnName( ui.getUiID("SLIDER_0"), "2DSlider0" );
   ui.setBtnName( ui.getUiID("SLIDER_0")+1, "2DSlider1" );
   lcd.setBrightness( 127 ); 
 }
 void loop( void ){
-  ui.update( &lcd );
+  ui.update( lcd );
   if( ui.getEvent() != NO_EVENT ){ 
     lcd.fillRect( 0, 0, 120, 160, TFT_BLACK);
     lcd.fillRect(
@@ -27,8 +27,8 @@ void loop( void ){
       ui.getSliderVec2( ui.getUiID("SLIDER_0"), SLIDER_NO_1).y * 160,
       20,20,TFT_BLUE); 
   }
-  ui.drawSliders( ui.getUiID("SLIDER_0"), &lcd, ui_sprite0 );
-  ui.showTouchEventInfo( &lcd, lcd.width() - 100, 0 );//タッチイベントを視覚化する
-  ui.showInfo( &lcd ,0, 48 );//ボタン情報、フレームレート情報などを表示します。
+  ui.drawSliders( ui.getUiID("SLIDER_0"), lcd, ui_sprite0 );
+  ui.showTouchEventInfo( lcd, lcd.width() - 80, 0 );//タッチイベントを視覚化する
+  ui.showInfo( lcd ,0, 48 );//ボタン情報、フレームレート情報などを表示します。
   delay(1); 
 }

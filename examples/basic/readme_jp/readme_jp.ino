@@ -74,16 +74,16 @@ void loop( void ){
   if( ui.getToggleVal( ui.getUiID("BTN_1"), 2 ) == true){ui.setSliderVal( ui.getUiID("SLIDER_0"), 2 , 1.0, 0.5 ); g = 255;}
   if( ui.getToggleVal( ui.getUiID("BTN_1"), 3 ) == true){ui.setSliderVal( ui.getUiID("SLIDER_0"), 3 , 1.0, 0.5 ); b = 255;}
 
-  //何かしらのイベントが発生したときだけ、矩形を描画し、画面輝度を変えます。
-  if( ui.getEvent() != NO_EVENT ){ lcd.fillRect( 0, 40, 240, 100, lcd.color888( r,g,b ) ); lcd.setBrightness( v );};
-  
-  //スライダボタンを描画します。
-  ui.drawSliders( ui.getUiID("SLIDER_0"), lcd, ui_sprite0 );
-  
-  //トグルボタンを描画します。
-  ui.drawToggles( ui.getUiID("BTN_1"),    lcd, ui_sprite1 );
+  // //何かしらのイベントが発生したときだけ、矩形を描画し、画面輝度を変えます。
+  if( ui.getEvent() != NO_EVENT ){
+    lcd.fillRect( 0, 40, 240, 100, lcd.color888( r,g,b ) ); lcd.setBrightness( v );
+  //   //スライダボタンを描画します。
+    ui.drawSliders( ui.getUiID("SLIDER_0"), lcd, ui_sprite0 );
+  //   //トグルボタンを描画します。
+    ui.drawToggles( ui.getUiID("BTN_1"),    lcd, ui_sprite1 );
+  }
 
-  ui.showTouchEventInfo( lcd, lcd.width() - 100, 0 );//タッチイベントを視覚化する
+  ui.showTouchEventInfo( lcd, lcd.width() - 80, 0 );//タッチイベントを視覚化する
   ui.showInfo( lcd ,0, 48);//ボタン情報、フレームレート情報などを表示します。
   //WDT対策
   delay(1);
