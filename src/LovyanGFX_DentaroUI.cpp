@@ -945,7 +945,123 @@ void LovyanGFX_DentaroUI::setLayoutSpritePos(int _LayoutSpritePosx, int _LayoutS
   layoutSpritePos = getTouchPoint(_LayoutSpritePosx, _LayoutSpritePosy);
 }
 
-void LovyanGFX_DentaroUI::createBtns(//修正中
+void LovyanGFX_DentaroUI::createOBtns(
+  int _x, int _y, int _r0,int _r1, int _a, int _n, LGFX_Sprite& _uiSprite, int _eventNo)
+  {//円形に並ぶ//中心位置XY、外半径r0、内半径r1、スタート角、分割数
+  
+  // int _x, int _y, 
+  // int _w,int _h,
+  // int _row, int _col, 
+  // LGFX_Sprite& _uiSprite, int _eventNo)
+  uiBoxes.push_back(*new UiContainer);
+
+  uiBoxes_num++;
+  uiID++;
+  uiBoxes[uiID].label = "BTN_" + String(uiID);
+  Serial.println("BTN_" + String(uiID)  + "=[" + String(uiID) + "]" + String(btnID)+"~");
+  
+  int _startId = btnID;//スタート時のボタンIDをセット
+  uiBoxes[uiID].b_sNo = btnID;
+  uiBoxes[uiID].id  = uiID;
+  uiBoxes[uiID].x   = _x;
+  uiBoxes[uiID].y   = _y;
+
+  // uiBoxes[uiID].w   = _w;
+  // uiBoxes[uiID].h   = _h;
+  // uiBoxes[uiID].row = _row;
+  // uiBoxes[uiID].col = _col;
+
+  uiBoxes[uiID].r0 = _r0;
+  uiBoxes[uiID].r1 = _r1;
+  uiBoxes[uiID].a  =  _a;
+  uiBoxes[uiID].n  =  _n;
+
+  uiBoxes[uiID].eventNo = _eventNo;
+  uiBoxes[uiID].toggle_mode = toggle_mode;
+
+  _uiSprite.setPsram(false);//UNUSE_PSRAM
+  _uiSprite.setColorDepth( COL_DEPTH );
+  _uiSprite.createSprite( 2*uiBoxes[uiID].r0, 2*uiBoxes[uiID].r0 );
+
+  int b_w = int(uiBoxes[uiID].r0 - uiBoxes[uiID].r1);//ボタン幅を計算
+
+  for(int i= 0; i < uiBoxes[uiID].n; i++)
+    {
+
+      int p_btnID = _startId + i;//事前に計算
+
+      touch_btn_list[p_btnID] = NULL;
+      touch_btn_list[p_btnID] = new TouchBtn(); 
+
+      // (int _btnID, 
+      // String _btnIDlabel, 
+      // int _btnNo, 
+
+      // int _btns_starAngle, 
+      // int _b_x, 
+      // int _b_y, 
+      // int _b_r0, 
+      // int _b_r1, 
+      // int _b_n, 
+      // String _btn_name, 
+      // lgfx::v1::touch_point_t _layoutSpritePos,
+      // lgfx::v1::touch_point_t _uiSpritePos,
+      // LGFX_Sprite& _sprite,
+      // int _btn_mode)
+
+      touch_btn_list[p_btnID]->initOBtn(
+        p_btnID, 
+        String(p_btnID),
+        i,
+        uiBoxes[uiID].a,//描画のスタート角（右から時計回り）
+        uiBoxes[uiID].x,
+        uiBoxes[uiID].y,
+        uiBoxes[uiID].r1,
+        uiBoxes[uiID].r0,
+        uiBoxes[uiID].n,//分割数
+        String(p_btnID), 
+        layoutSpritePos, 
+        getTouchPoint(_x, _y),
+        _uiSprite,
+        TOUCH_OBTN_MODE);
+
+
+      // if(toggle_mode == false){
+      //   touch_btn_list[p_btnID]->initBtn(p_btnID, String(p_btnID),
+      //   i*b_w,
+      //   j*b_h,
+      //   b_w,
+      //   b_h, 
+      //   String(p_btnID), 
+      //   layoutSpritePos, 
+      //   getTouchPoint(_x, _y), 
+      //   _uiSprite,
+      //   TOUCH_BTN_MODE);
+      // }
+      // else if(toggle_mode == true){
+      //   touch_btn_list[p_btnID]->initBtn(p_btnID, String(p_btnID),
+      //   i*b_w,
+      //   j*b_h,
+      //   b_w,
+      //   b_h, 
+      //   String(p_btnID), 
+      //   layoutSpritePos, 
+      //   getTouchPoint(_x, _y), 
+      //   _uiSprite,
+      //   TOUCH_TOGGLE_MODE);
+      // }
+
+      touch_btn_list[ p_btnID ]->setVisibleF( true );
+      touch_btn_list[ p_btnID ]->setAvailableF( true );
+
+      btnID++;//ボタンを更新
+    
+  }
+  uiBoxes[uiID].b_num =  btnID - uiBoxes[uiID].b_sNo;//UIのボタン数をセット
+}
+
+
+void LovyanGFX_DentaroUI::createBtns(
   int _x, int _y, 
   int _w,int _h,
   int _row, int _col, 
@@ -1357,11 +1473,6 @@ void LovyanGFX_DentaroUI::drawBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _ui
   drawBtns( _uiID, _lgfx, _uiSprite, uiBoxes[_uiID].x, uiBoxes[_uiID].y);
 }
 
-// void LovyanGFX_DentaroUI::drawBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _x, int _y){
-//   toggle_mode = false;
-//   drawBtns( _uiID, _lgfx, _uiSprite, _x, _y);
-// }
-
 void LovyanGFX_DentaroUI::drawToggles(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite){
   if( getEvent() == TOUCH ){
     if( _uiID >= 0 ){ //NULLを除外
@@ -1371,9 +1482,39 @@ void LovyanGFX_DentaroUI::drawToggles(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& 
 
     }
   }
-  // if( getEvent() != NO_EVENT ){
+}
+
+void LovyanGFX_DentaroUI::drawOBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite){
+  toggle_mode = false;
+  drawOBtns( _uiID, _lgfx, _uiSprite, uiBoxes[_uiID].x, uiBoxes[_uiID].y);
+}
+
+void LovyanGFX_DentaroUI::drawOBtns( int uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _x, int _y)
+{
+  if( getEvent() != NO_EVENT )
+  {
+  if(getEvent() == uiBoxes[uiID].eventNo || uiBoxes[uiID].eventNo == MULTI_EVENT)
+  {
+    int _id = uiBoxes[uiID].b_sNo;
+    int _btnNum = uiBoxes[uiID].b_num;
+    _uiSprite.setPivot( 0, 0 );//setPivot()で回転する場合の原点を指定します。初期値は左上の(0, 0)だと思います
+
+    for(int i= _id; i < _id + _btnNum; i++)
+    {
+      touch_btn_list[i]->setSelectBtnF(false);
+      if(selectBtnID == i)touch_btn_list[i]->setSelectBtnF(true);
+      else touch_btn_list[i]->setSelectBtnF(false);
+      // touch_btn_list[i]->btnDraw(_uiSprite); //スプライト経由では描画されないので、
+      touch_btn_list[i]->btnDraw(_lgfx);//lcdに直書きする
+
+    }
+
+    // _lgfx.pushSprite(75, 75);
+    // _lgfx.pushSprite(uiBoxes[uiID].x, uiBoxes[uiID].y);
+    //_uiSprite.pushSprite(&_lgfx, uiBoxes[uiID].x, uiBoxes[uiID].y);
     
-  // }
+    }
+  }
 }
 
 void LovyanGFX_DentaroUI::drawToggles(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _x, int _y){

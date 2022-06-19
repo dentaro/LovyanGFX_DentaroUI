@@ -30,6 +30,7 @@ using namespace std;
 #define TOUCH_SLIDER_MODE 2
 #define TOUCH_FLICK_MODE 3
 #define TOUCH_TOGGLE_MODE 4
+#define TOUCH_OBTN_MODE 5
 
 #define TFT4_BLACK 0
 #define TFT4_BLUE 1
@@ -127,11 +128,20 @@ class TouchBtn {
     std::list<DelegateBase2*> lim2;
     int b_x = 0;
     int b_y = 0;
+
     int b_w = 0;
     int b_h = 0;
     int b_hw = 0;
     int b_hh = 0;
     int b_qw = 0;
+
+    int b_a = 0;
+    int b_a0 = 360;
+    int b_a1 = 0;
+    int b_r0 = 50;
+    int b_r1 = 0;
+    int b_n = 1;
+    int btns_starAngle = 0;
 
     int s_x = 0;
     int s_y = 0;
@@ -143,7 +153,6 @@ class TouchBtn {
 
     float b_str_hw = 4;//文字列の半分の長さを計算
 
-    
     int sliderPosx = 0;
     int sliderPosy = 0;
     int xy_mode = XY_VAL;
@@ -151,7 +160,8 @@ class TouchBtn {
     uint8_t bgColorIndex;
     LGFX_Sprite divSprite0;
     uint16_t color = TFT_WHITE;
-    int btnID = 0;
+    int btnID = 0;//すべてのボタンの固有のID
+    int btnNo = 0;//UI内での順番
     String btnIDlabel = "";//ボタン番号
     bool selectBtnF = false;
     String btn_name = "";//ボタンの名前
@@ -185,6 +195,12 @@ public:
     LGFX_Sprite& _sprite,
     int _btn_mode);
 
+    void initOBtn(int _btnID, String _btnIDlabel, int _btnNo, int _btns_starAngle, int _b_x, int _b_y, int _b_r0, int _b_r1, int _b_n, String _btn_name, 
+    lgfx::v1::touch_point_t _layoutSpritePos,
+    lgfx::v1::touch_point_t _uiSpritePos,
+    LGFX_Sprite& _sprite,
+    int _btn_mode);
+
     void setlayoutSpritePos(lgfx::v1::touch_point_t _layoutSpritePos);
     
     void initSlider(int _btnID, int _s_x, int _s_y, int _s_w, int _s_h, String _btn_name, 
@@ -196,7 +212,8 @@ public:
     // void initTile(int _btnID,String _btn_name, lgfx::v1::touch_point_t _layoutSpritePos, int layoutSprite_w, int layoutSprite_h, LGFX_Sprite& _layoutSprite, LGFX_Sprite& _g_basic_sprite);
     // void setBtnName(String _btnName);
     void setBtnNameFalse(String _btnNameFalse);
-    void btnDraw(LGFX_Sprite& _sprite);
+    // void btnDraw(LGFX_Sprite& _uiSprite);
+    void btnDraw(LovyanGFX& _uiSprite);
     void flickDraw(LGFX_Sprite& _sprite);
     void sliderDraw(LGFX_Sprite& _uiSprite, lgfx::v1::touch_point_t _tp);
     void tileDraw(LovyanGFX* _lgfx, LGFX_Sprite& _layoutSprite, lgfx::v1::touch_point_t _layoutSpritePos, lgfx::v1::touch_point_t _sp, uint8_t _bgColIndex, LGFX_Sprite& _g_basic_sprite);

@@ -125,6 +125,12 @@ class UiContainer{
   int h = 0;
   int row = 0;
   int col = 0;
+
+  int r0 = 0;
+  int r1 = 0;
+  int a = 0;
+  int n = 0;
+
   int b_sNo = 0;
   int b_num = 0;
   int eventNo = -1; //MULTI_EVENT=-1
@@ -350,6 +356,9 @@ public:
     void setBtnName(int _btnNo, String _btnName);
     void setBtnName(int _btnNo, String _btnName, String _btnNameFalse);//toggle用
     void setQWERTY(int _uiID, String _btnsString, LGFX_Sprite& _sprite);
+
+    void createOBtns( int _x, int _y, int _r0,int _r1, int _a, int _n, LGFX_Sprite& _uiSprite, int _eventNo);//円形に並ぶ
+
     void createBtns( int _uiSprite_x, int _uiSprite_y, int _w,int _h, int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo);//縦方向に並ぶ
     void createBtns( int _uiSprite_x, int _uiSprite_y, int _w,int _h,int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo, bool _colF);//横方向に並ぶ
     void createToggles( int _uiSprite_x, int _uiSprite_y, int _w,int _h, int _row, int _col, LGFX_Sprite& _uiSprite, int _eventNo);//縦方向に並ぶ
@@ -364,6 +373,10 @@ public:
     void drawFlicks( int uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
     void drawBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite);
     void drawBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
+    
+    void drawOBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite);
+    void drawOBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
+
     void drawToggles(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
     void drawToggles(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite);
     void drawSliders(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _uiSprite_x, int _uiSprite_y);
