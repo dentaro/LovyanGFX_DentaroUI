@@ -9,6 +9,7 @@
 LovyanGFXが動作するデバイス
 
 [src](src/)の中にあるLGFX_ESP32_custom_sample.hppにデバイスの設定を書いておき、TouchBtn.hppから読み込んでいます。
+
 （TouchBtn.hppで選択できる、LovyanGFXのAUTODETECT機能を使うとM5スタックシリーズのデバイスを自動で認識してくれるかもしれません。）
 
 使い方 How to use
@@ -16,20 +17,25 @@ LovyanGFXが動作するデバイス
 [examples](examples/)にサンプルがあります。
 
 ・基本的な使い方
+
 LovyanGFXをインストールしてください。
 ご自身でUIを作成する場合、
 createToggles(), createSliders()など、create系の関数でUIのIＤを自動取得しますので、
 シリアルコンソールの出力で、以下のような記述を確認してから使ってください。
 
 [UI_ID information]
+
 BTN_0=[0]0~
+
 BTN_1=[1]8~
 
 BTN_0がボタンの名称（String型）
+
 [0]はスタート番号
+
 0~はボタンid番号を表しています。
 
-loop内のdraw系の関数を利用をする際に必要になります。
+loop内のdraw系の関数を利用する際に必要になります。
 
 ・注意事項
 随時更新していますので、なるべく最新版のLovyanGFXを使って下さい。
