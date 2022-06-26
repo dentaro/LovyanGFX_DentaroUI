@@ -7,7 +7,9 @@
 対応環境
 ---------------
 LovyanGFXが動作するデバイス
+
 [src](src/)の中にあるLGFX_ESP32_custom_sample.hppに設定を書いておき、TouchBtn.hppから読み込んでいます。
+
 使い方 How to use
 ----------------
 [examples](examples/)にサンプルがあります。
