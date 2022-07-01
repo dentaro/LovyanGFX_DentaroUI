@@ -133,6 +133,12 @@ class UiContainer{
   int r1 = 0;
   int a = 0;
   int n = 0;
+  
+  //円形ボタン
+  int c_d = 0;//中心から現在のタッチポイントまでの距離current_distance
+  int c_a = 0;//中心から現在のタッチポイントがなす角度current_angle
+  int p_a = 0;//前フレームのcurrent_angle= pre_angle
+  int diff_a = 0;//c_a - p_a;
 
   int b_sNo = 0;
   int b_num = 0;
@@ -717,5 +723,9 @@ public:
     void task2_setPngTile(int _posId);
 
     void getTilePos(double lat, double lon, int zoom_level);
+
+    void updateOBtnSlider(int uiID, LGFX_Sprite& _uiSprite, int _x, int _y);
+    int getOBtnDiffAngle(int uiID);
+    
 
 };

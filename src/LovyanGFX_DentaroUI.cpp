@@ -201,7 +201,7 @@ void LovyanGFX_DentaroUI::update( LGFX& _lcd )
   {
     clist[0] = TFT_BLUE;
     unsigned long touchedTime = micros() - sTime;
-    float dist = sqrt( pow((tp.x - sp.x),2) + pow((tp.y - sp.y),2) );
+    float dist = sqrt( pow((tp.x - sp.x),2) + pow((tp.y - sp.y), 2) );
 
     if(touchedTime > 120000&&touchedTime <= 160000){
       if(dist <= FLICK_DIST){
@@ -1469,36 +1469,6 @@ void LovyanGFX_DentaroUI::drawToggles(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& 
   }
 }
 
-// void LovyanGFX_DentaroUI::drawOBtns(int _uiID, LovyanGFX& _lgfx, int _x, int _y)
-// {
-//   toggle_mode = false;
-//   if( getEvent() != NO_EVENT )
-//   {
-//     if(getEvent() == uiBoxes[uiID].eventNo || uiBoxes[uiID].eventNo == MULTI_EVENT)
-//     {
-//       int _id = uiBoxes[uiID].b_sNo;
-//       int _btnNum = uiBoxes[uiID].b_num;
-
-//         for(int i= _id; i < _id + _btnNum; i++)
-//         {
-//           touch_btn_list[i]->setSelectBtnF(false);
-//           if(selectBtnID == i)touch_btn_list[i]->setSelectBtnF(true);
-//           else touch_btn_list[i]->setSelectBtnF(false);
-
-//           touch_btn_list[i]->btnDraw(_lgfx, _x, _y); //lcdに描画
-//         }
-//     }
-//   }
-// }
-
-
-// void LovyanGFX_DentaroUI::drawOBtns(int _uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite )
-// {
-//   toggle_mode = false;
-//   drawOBtns( _uiID, _lgfx, _uiSprite, -320, -320);//座標なし(-320,-320)で出力
-// }
-
-
 void LovyanGFX_DentaroUI::drawOBtns( int uiID, LovyanGFX& _lgfx, LGFX_Sprite& _uiSprite, int _x, int _y )
 {
 
@@ -1522,8 +1492,6 @@ void LovyanGFX_DentaroUI::drawOBtns( int uiID, LovyanGFX& _lgfx, LGFX_Sprite& _u
 
     int _id = uiBoxes[uiID].b_sNo;
 
-    // if(_x > -320 && _y > -320 )//0以上の座標値が入っていれば
-    // {
       for(int i= 0; i < uiBoxes[uiID].n; i++)
       {
         int p_btnID = _id + i;//事前に計算
@@ -1534,18 +1502,6 @@ void LovyanGFX_DentaroUI::drawOBtns( int uiID, LovyanGFX& _lgfx, LGFX_Sprite& _u
           _x + _uiSprite.width()/2, 
           _y + _uiSprite.height()/2);
       }
-      // _uiSprite.pushSprite(&_lgfx, uiBoxes[uiID].x, uiBoxes[uiID].y);//createで指定した位置
-      // _uiSprite.pushSprite(&_lgfx, _x, _y);//今回再定義した位置に強制的に移動
-    // }else{
-    //   for(int i= 0; i < uiBoxes[uiID].n; i++)
-    //   {
-    //     int p_btnID = _id + i;//事前に計算
-    //     //タッチポイントをUI表示位置にずらす
-    //     uiBoxes[uiID].x = _x;
-    //     uiBoxes[uiID].y = _y;
-    //     touch_btn_list[p_btnID]->setOBtnPos( uiBoxes[uiID].x, uiBoxes[uiID].y);
-    //   }
-    // }
   }
 }
 
@@ -2621,10 +2577,75 @@ void LovyanGFX_DentaroUI::getTilePos(double _lat, double _lon, int zoom_level)
   //y = ((-log(tan((45 + _lat / 2) * M_PI / 180)) + M_PI) * pow(2, zoom_level-1) / (2 * M_PI));
   // ytileNo = int(y);
 
-
 // //現在地を含むタイル番号を計算
   double lat_rad = _lat * (M_PI/180);
   double n = pow(2, zoom_level);
   xtileNo = int((_lon + 180.0) / 360.0 * n);
   ytileNo = int((1.0 - log(tan(lat_rad) + (1 / cos(lat_rad))) / M_PI) / 2.0 * n);
+}
+
+void LovyanGFX_DentaroUI::updateOBtnSlider( int uiID, LGFX_Sprite& _uiSprite, int _x, int _y )
+{
+uiBoxes[uiID].c_d = sqrt( ( pow( tp.x - (_x + uiBoxes[uiID].r1 ), 2.0 ) + pow( tp.y- (_y + uiBoxes[uiID].r1 ), 2.0 ) ));
+if(uiBoxes[uiID].c_d > uiBoxes[uiID].r0 && uiBoxes[uiID].c_d < uiBoxes[uiID].r1)
+  {
+    if( getEvent() == MOVE )
+    {
+
+
+    uiBoxes[uiID].c_a = int( ( atan2( tp.y - (_y + uiBoxes[uiID].r1 ) , 
+                                      tp.x - (_x + uiBoxes[uiID].r1 ) ) * 180/M_PI ) );//現在のボタン中心の角度を登録
+
+    if(uiBoxes[uiID].c_a < 0) uiBoxes[uiID].c_a = 180 + ( 180 + uiBoxes[uiID].c_a );//0~360の値に収める
+    
+    // if( abs(uiBoxes[uiID].c_a - uiBoxes[uiID].p_a) > 0 ){
+      
+      uiBoxes[uiID].diff_a = uiBoxes[uiID].c_a - uiBoxes[uiID].p_a;//差分を計算する
+
+      Serial.println(uiBoxes[uiID].diff_a);
+
+      // if( getEvent() == TOUCH ){
+        // uiBoxes[uiID].p_a = uiBoxes[uiID].c_a;//タッチした時のボタン中心の角度を登録しておく
+      // }
+      
+
+      if(uiBoxes[uiID].diff_a > 180){
+        uiBoxes[uiID].diff_a -= 360; 
+      }else if(uiBoxes[uiID].diff_a < -180){
+        uiBoxes[uiID].diff_a += 360; 
+      }
+
+      // Serial.println(uiBoxes[uiID].diff_a);
+
+      uiBoxes[uiID].p_a = uiBoxes[uiID].c_a;
+      Serial.print(uiBoxes[uiID].p_a);
+      Serial.print(":");
+    }
+    else if( getEvent() == RELEASE )
+    {
+      uiBoxes[uiID].diff_a = 0;
+    }
+
+  }
+  
+  
+
+}
+
+int LovyanGFX_DentaroUI::getOBtnDiffAngle(int uiID){
+  
+    
+    return uiBoxes[uiID].diff_a;
+  
+
+
+  // diff_a = c_a - s_a;
+
+  // if(diff_a > 180){
+  //   diff_a -= 360; 
+  // }else if(diff_a < -180){
+  //   diff_a += 360; 
+  // }
+
+  // return diff_a;
 }
