@@ -45,7 +45,7 @@ void loop( void )
     //UI自体を動かす
     if(a<360){a++;}
     else{a=0;}
-    ui_x = cos(a*PI/180)*90;
+    ui_x = 45 + cos(a*PI/180)*45;
     ui_y = 170;
 
     //UIの両サイドを塗りなおす
@@ -53,7 +53,12 @@ void loop( void )
     lcd.fillRect(ui_x+150, 170, 10, 150, TFT_BLACK);
 
     //ui_sprite0スプライトに描画
+    ui_sprite0.setColor(TFT_BLUE);//円形ボタンは1分割の時だけボタンの色変えられます(分割すると白)
+    ui_sprite0.setTextColor(TFT_BLACK);//ボタン名の色
     ui.drawOBtns( ui.getUiID("BTN_0"), lcd, ui_sprite0, ui_x, ui_y );
+
+    ui_sprite0.setColor(TFT_RED);//円形ボタンは1分割の時だけボタンの色変えられます(分割すると白)
+    ui_sprite0.setTextColor(TFT_BLACK);//ボタン名の色
     ui.drawOBtns( ui.getUiID("BTN_1"), lcd, ui_sprite0, ui_x, ui_y );
 
     ui_sprite0.pushSprite( ui_x, ui_y );//一つのスプライトui_sprite0にまとめて出力
