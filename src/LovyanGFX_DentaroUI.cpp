@@ -1,7 +1,10 @@
 #include "LovyanGFX_DentaroUI.hpp"
 using namespace std;
 
-#define FLICK_DIST 3
+#define FLICK_DIST 4
+#define HOLDING_SEC 160000
+#define TAP_TO_TAP_SEC 220000
+
 // #include <vector>
 //LovyanGFX_DentaroUI::LovyanGFX_DentaroUI(LGFX& _lcd)
 //{
@@ -183,83 +186,174 @@ void LovyanGFX_DentaroUI::update( LGFX& _lcd )
     bitClear(touchState, 0);//右０ビット目を0（Clear）に
   }
   //下位２ビットをみてイベントを振り分け
-  touchState &= B00000011;
+  touchState &= B00000011;//マスク
   if (touchState == B_TOUCH){
-    sp = tp; sTime =  micros();
-    eventState = TOUCH;//6 
+    sp = tp; touchStartTime =  micros();
+    eventState = TOUCH;//7 
+    setEventBit(TOUCH,1);
   }
   else if (touchState == B_MOVE) {
     clist[0] = TFT_GREEN;
-    unsigned long touchedTime = micros() - sTime;
+    unsigned long holdingTime = micros() - touchStartTime;
+    
     eventState = WAIT;
-    if(touchedTime > 160000){
+    setEventBit(WAIT,1);
+    if(holdingTime > HOLDING_SEC){
       clist[0] = TFT_YELLOW;
       eventState = MOVE;//8
+      setEventBit(MOVE,1);
     }
   }
   else if (touchState == B_RELEASE) 
   {
     clist[0] = TFT_BLUE;
-    unsigned long touchedTime = micros() - sTime;
+    unsigned long holdingTime = micros() - touchStartTime;
     float dist = sqrt( pow((tp.x - sp.x),2) + pow((tp.y - sp.y), 2) );
 
-    if(touchedTime > 120000&&touchedTime <= 160000){
+    if(holdingTime > HOLDING_SEC - 10000 && holdingTime <= HOLDING_SEC){
       if(dist <= FLICK_DIST){
         eventState = WAIT;//5
+        setEventBit(WAIT,1);
       }
     }
-    else if(touchedTime > 160000)
+    else if(holdingTime > HOLDING_SEC)
     {
       eventState = DRAG;//2
+      setEventBit(DRAG,1);
     }
-    else if(dist <= FLICK_DIST){
-      eventState = TAPPED;//4
-      
+    else if(dist <= FLICK_DIST)
+    {
       float dist2 = sqrt( pow((tp.x - sp2.x),2) + pow((tp.y - sp2.y),2) );
-      if(sTime - tappedTime < 200000 && dist2 < FLICK_DIST ){//ダブルタップの間の時間調整, 位置判定
-        eventState = WTAPPED;//5
+      
+      if(preTouchStartTime != 0)
+      {
+        unsigned long tappingTime  = touchStartTime - preTouchStartTime;
+        if( tappingTime < TAP_TO_TAP_SEC ){//前とのタップ間の時間調整, 位置判定
+          if(dist2 < FLICK_DIST) tapCount++;//短距離、短時間なら加算
+        }
+        else if( tappingTime >= TAP_TO_TAP_SEC )//時間が空いていたらリセット
+        {
+
+          lastTapCount = tapCount;
+          if(lastTapCount>0){
+            eventState = WTAPPED;
+            setEventBit(WTAPPED, 1);
+          }else if(lastTapCount==0){
+            eventState = TAPPED;
+            setEventBit(TAPPED, 1);
+          }
+          tapCount = 0;
+
+        }
       }
-      tappedTime = micros();
+
+      //tapCount++;//今回タップした分を足す
+      lastTappedTime = micros();
+      Serial.print(tapCount);
+      Serial.print(":");
+      Serial.print(micros());
+      Serial.print(":");
+      Serial.println(micros() - firstTappedTime);
+
+      
+      // if(endTapCount)
+
+      if(tapCount == 0){
+        firstTappedTime = touchStartTime;//tap番号0のタップスタート時間を格納
+        eventState = TAPPED;
+        setEventBit(TAPPED, 1);
+      }
+
+      if(tapCount == 1){
+        eventState = WTAPPED;//4
+        setEventBit(WTAPPED, 1);
+      }
+      
+
       sp2 = tp;
+      preTouchStartTime = touchStartTime;
     }
     else if(dist > FLICK_DIST)
     {
-       if(touchedTime <= 160000){
+       if(holdingTime <= HOLDING_SEC){
         float angle = getAngle(sp, tp);
   //      Serial.println(angle);
           
           if(angle <= 22.5 || angle > 337.5){
             eventState = RIGHT_FLICK;//0
+            setEventBit(RIGHT_FLICK, 1);
             flickState = RIGHT_FLICK;//0
           }else if(angle <= 67.5 && angle > 22.5){
             eventState = R_D_FLICK;//7
+            setEventBit(R_D_FLICK, 1);
             flickState = R_D_FLICK;//7
           }else if(angle <= 112.5 && angle > 67.5){
             eventState = DOWN_FLICK;//6
+            setEventBit(DOWN_FLICK, 1);
             flickState = DOWN_FLICK;//6
           }else if(angle <= 157.5 && angle > 112.5){
             eventState = D_L_FLICK;//5
+            setEventBit(D_L_FLICK, 1);
             flickState = D_L_FLICK;//5
           }else if(angle <= 202.5 && angle > 157.5){
             eventState = LEFT_FLICK;//4
+            setEventBit(LEFT_FLICK, 1);
             flickState = LEFT_FLICK;//4
           }else if(angle <= 247.5 && angle > 202.5){
             eventState = L_U_FLICK;//3
+            setEventBit(L_U_FLICK, 1);
             flickState = L_U_FLICK;//3
           }else if(angle <= 292.5 && angle > 247.5){
             eventState = UP_FLICK;//2
+            setEventBit(UP_FLICK, 1);
             flickState = UP_FLICK;//2
           }else if(angle <= 337.5 && angle > 292.5){
             eventState = U_R_FLICK;//1
+            setEventBit(U_R_FLICK, 1);
             flickState = U_R_FLICK;//1
           }
 
        }
     }
     eventState = RELEASE;//9
-  }else if (touchState == B_UNTOUCH) {
-    clist[0] = TFT_DARKGREEN;
+    setEventBit(RELEASE,1);
+
+    
+
   }
+  else if (touchState == B_UNTOUCH)
+  {
+    clist[0] = TFT_DARKGREEN;
+
+  // if(micros() - firstTappedTime < 200000 && jadgeF == false){
+  //   jadgeF = true;
+  // }
+
+    // if(micros() - firstTappedTime > 200000 && jadgeF == true){
+    //   eventState = TAPPED;//
+    //   setEventBit(TAPPED, 1);
+    //   jadgeF = false;
+    // }
+  }
+
+    
+
+
+  // if(micros() - firstTappedTime < 320000 && jadgeF == false){
+  //   jadgeF = true;
+  // }
+  // if(jadgeF == true){//タップ番号０時点から現在の時間までの経過時間がｗTapの判定時間を超えたら
+  //   if(tapCount == 0){
+  //     eventState = TAPPED;//4
+  //     setEventBit(TAPPED, 1);
+  //   }else if(tapCount == 1){
+  //     eventState = WTAPPED;//4
+  //     setEventBit(WTAPPED, 1);
+  //   }
+  //   jadgeF = false;
+  // }
+
+  
 
   for(int i = 0; i < uiBoxes_num; i++){
     for(int j = 0; j<uiBoxes[i].b_num; j++){
@@ -580,7 +674,7 @@ void LovyanGFX_DentaroUI::updateSelectBtnID(int _selectBtnID){
 
 void LovyanGFX_DentaroUI::showTouchEventInfo(LovyanGFX& _lgfx, int _x, int _y){
   for(int i = 0; i < 5; i++){
-    _lgfx.fillRect(_x + 1 + 10*i, _y, 9,9,clist[0]);
+    _lgfx.fillRect(_x + 1 + 10*i, _y, 9, 9, clist[0]);
   }
 }
 
@@ -2602,7 +2696,7 @@ if(uiBoxes[uiID].c_d > uiBoxes[uiID].r0 && uiBoxes[uiID].c_d < uiBoxes[uiID].r1)
       
       uiBoxes[uiID].diff_a = uiBoxes[uiID].c_a - uiBoxes[uiID].p_a;//差分を計算する
 
-      Serial.println(uiBoxes[uiID].diff_a);
+      // Serial.println(uiBoxes[uiID].diff_a);
 
       // if( getEvent() == TOUCH ){
         // uiBoxes[uiID].p_a = uiBoxes[uiID].c_a;//タッチした時のボタン中心の角度を登録しておく
@@ -2618,8 +2712,8 @@ if(uiBoxes[uiID].c_d > uiBoxes[uiID].r0 && uiBoxes[uiID].c_d < uiBoxes[uiID].r1)
       // Serial.println(uiBoxes[uiID].diff_a);
 
       uiBoxes[uiID].p_a = uiBoxes[uiID].c_a;
-      Serial.print(uiBoxes[uiID].p_a);
-      Serial.print(":");
+      // Serial.print(uiBoxes[uiID].p_a);
+      // Serial.print(":");
     }
     else if( getEvent() == RELEASE )
     {
@@ -2627,18 +2721,22 @@ if(uiBoxes[uiID].c_d > uiBoxes[uiID].r0 && uiBoxes[uiID].c_d < uiBoxes[uiID].r1)
     }
 
   }
-  
-  
+}
 
+// int LovyanGFX_DentaroUI::getOBtnPreAngle(int uiID){
+//     return uiBoxes[uiID].p_a;
+// }
+
+// int LovyanGFX_DentaroUI::getOBtnStartAngle(int uiID){
+//     return uiBoxes[uiID].s_a;
+// }
+
+int LovyanGFX_DentaroUI::getCurrentAngle(int uiID){
+    return uiBoxes[uiID].c_a;
 }
 
 int LovyanGFX_DentaroUI::getOBtnDiffAngle(int uiID){
-  
-    
     return uiBoxes[uiID].diff_a;
-  
-
-
   // diff_a = c_a - s_a;
 
   // if(diff_a > 180){
@@ -2648,4 +2746,30 @@ int LovyanGFX_DentaroUI::getOBtnDiffAngle(int uiID){
   // }
 
   // return diff_a;
+}
+
+void LovyanGFX_DentaroUI::setEventBit(int bitNo, bool inputBit){
+
+  if ( inputBit == 1 )
+  {
+    bitSet(eventBits, bitNo-1);//右０ビット目を１（Set）に
+  }
+  else if ( inputBit == 0 )
+  {
+    bitClear(eventBits, bitNo);//右０ビット目を0（Clear）に
+  }
+
+}
+
+bool LovyanGFX_DentaroUI::getEventBit(int bitNo)
+{
+  uint32_t b = eventBits;//コピー
+  //uint32_t mb = 0b1;//マスク用
+  bool rb = 0b1 & (b >> bitNo-1);//ビットシフトして、マスクで１ビット目を抽出してboolにキャスト
+  return  rb;
+}
+
+void LovyanGFX_DentaroUI::resetEventBits()
+{
+  eventBits = 0b00000000000000000000000000000000;
 }

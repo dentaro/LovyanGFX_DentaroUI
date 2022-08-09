@@ -279,9 +279,13 @@ class MapTile
 
 class LovyanGFX_DentaroUI {
   
-   private:
-   
-    String kanalist[HENKAN_NUM][3] = {
+  private:
+  uint32_t eventBits = 0b00000000000000000000000000000000;
+  uint8_t tapCount = 0;//タップカウンタ
+  uint8_t lastTapCount = 0;
+  bool jadgeF = false;
+
+  String kanalist[HENKAN_NUM][3] = {
   {"あ","ぁ","＿"},
   {"い","ぃ","ゐ"},
   {"う","ぅ","＿"},
@@ -353,8 +357,10 @@ class LovyanGFX_DentaroUI {
     lgfx::v1::touch_point_t lcdPos;//レイアウト用
     uint32_t btnState = B00000000;
     uint16_t touchState = B00000000;
-    unsigned long sTime = 0;
-    unsigned long tappedTime = 0;
+    unsigned long touchStartTime = 0;
+    unsigned long preTouchStartTime = 0;
+    unsigned long lastTappedTime = 0;
+    unsigned long firstTappedTime = 0;
     
     int eventState = -1;
     int flickState = -1;
@@ -725,7 +731,14 @@ public:
     void getTilePos(double lat, double lon, int zoom_level);
 
     void updateOBtnSlider(int uiID, LGFX_Sprite& _uiSprite, int _x, int _y);
-    int getOBtnDiffAngle(int uiID);
     
+    // int getOBtnPreAngle(int uiID);
+    // int getOBtnStartAngle(int uiID);
+    int getCurrentAngle(int uiID);
+    int getOBtnDiffAngle(int uiID);
 
+    //イベントビットの操作
+    bool getEventBit(int bitNo);
+    void setEventBit(int bitNo, bool inputBit);
+    void resetEventBits();
 };

@@ -68,14 +68,14 @@ using namespace std;
 #define RELEASE 10
 
 //flickState
-#define RIGHT_FLICK 20
-#define U_R_FLICK 21
-#define UP_FLICK 22
-#define L_U_FLICK 23
-#define LEFT_FLICK 24
-#define D_L_FLICK 25
-#define DOWN_FLICK 26
-#define R_D_FLICK 27
+#define RIGHT_FLICK 11
+#define U_R_FLICK 12
+#define UP_FLICK 13
+#define L_U_FLICK 14
+#define LEFT_FLICK 15
+#define D_L_FLICK 16
+#define DOWN_FLICK 17
+#define R_D_FLICK 18
 
 #define MULTI_EVENT 31
 
