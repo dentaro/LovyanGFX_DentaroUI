@@ -1,5 +1,5 @@
 #include <LovyanGFX_DentaroUI.hpp>
-LGFX lcd;
+static LGFX lcd;
 LovyanGFX_DentaroUI ui;
 static LGFX_Sprite ui_sprite0( &lcd );//スライダ用
 static LGFX_Sprite ui_sprite1( &lcd );//トグル用

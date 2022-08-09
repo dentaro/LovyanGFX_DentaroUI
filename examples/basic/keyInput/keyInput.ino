@@ -1,5 +1,5 @@
 #include <LovyanGFX_DentaroUI.hpp>
-LGFX lcd;
+static LGFX lcd;
 LovyanGFX_DentaroUI ui;
 static LGFX_Sprite ui_sprite0( &lcd );//スライダ用
 static LGFX_Sprite output_sprite( &lcd );//テキスト用
@@ -10,9 +10,10 @@ void setup() {
   ui.createBtns( 45, 170,  150, 150, 3, 3, ui_sprite0, TOUCH );
   output_sprite.createSprite(240, 64);
 }
-void loop( void ){
+void loop( void )
+{
   ui.update( lcd );
-  if( ui.getEvent() != NO_EVENT && ui.getTouchBtnID()>=0){//何かイベントがあれば
+  if( ui.getEvent() != NO_EVENT ){//何かイベントがあれば
     if(ui.getTouchBtnID() == 0) btnNo = 0;
     else if(ui.getTouchBtnID() == 1) btnNo = 1;
     else if(ui.getTouchBtnID() == 2) btnNo = 2;
@@ -33,6 +34,6 @@ void loop( void ){
     }
   }  
   ui.showTouchEventInfo( lcd, lcd.width() - 100, 0 );//タッチイベントを視覚化する
-  ui.showInfo( lcd ,0, 48 );//ボタン情報、フレームレート情報などを表示します。
+  ui.showInfo( lcd, 0, 0 );//ボタン情報、フレームレート情報などを表示します。
   delay(1);
 }

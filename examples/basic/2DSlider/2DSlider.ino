@@ -28,7 +28,7 @@ void loop( void ){
       20,20,TFT_BLUE); 
   }
   ui.drawSliders( ui.getUiID("SLIDER_0"), lcd, ui_sprite0 );
-  ui.showTouchEventInfo( lcd, lcd.width() - 80, 0 );//タッチイベントを視覚化する
-  ui.showInfo( lcd ,0, 48 );//ボタン情報、フレームレート情報などを表示します。
+  ui.showTouchEventInfo( lcd, lcd.width() - 100, 0 );//タッチイベントを視覚化する
+  ui.showInfo( lcd ,0,0 );//ボタン情報、フレームレート情報などを表示します。
   delay(1); 
 }
