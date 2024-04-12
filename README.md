@@ -61,9 +61,6 @@ XPT2046タッチパネルを利用した自作ゲーム機のために開発を�
 
 https://twitter.com/oRLF6nXrMai7KiK
 
-・でんたろう商会
-
-https://lolipop-132506b3f67dddf0.ssl-lolipop.jp/ec/dentaro/index.html
 
 謝辞
 ----------------
